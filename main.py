@@ -13,6 +13,11 @@ screen = pygame.display.set_mode((1080, 720))
 arriere_plan = pygame.image.load("image/ecran_titre.JPG")
 arriere_plan = pygame.transform.scale(arriere_plan, (1080, 720))
 
+# Chargement de la musique
+music = pygame.mixer.Sound('musique/ambiance.mp3')
+music.play(loops=-1)  # Répéter la musique en boucle
+music.set_volume(0.1)
+
 # Couleurs
 BLANC = (255, 255, 255)
 ROUGE = (255, 0, 0)
@@ -25,7 +30,7 @@ options = ["Jouer", "Quitter"]
 selected_option = 0  # Index de l'option sélectionnée
 
 # Options pour la sélection des personnages
-options_perso = ["2 joueurs", "3 joueurs"]
+options_perso = ["2 joueurs", "3 joueurs","retour"]
 
 # Définition de la scène en cours
 scene_courant = "Menu principal"
@@ -95,3 +100,5 @@ while running:
                         game.nombre_joueur = 3
                         print("Nombre de joueurs est 3")
                         running = False  # Remplacer par une fonction pour démarrer le jeu
+                    elif selected_option == 2 : 
+                        scene_courant = "Menu principal"
