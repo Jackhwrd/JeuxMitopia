@@ -21,6 +21,7 @@ music.set_volume(0.1)
 # Couleurs
 BLANC = (255, 255, 255)
 ROUGE = (255, 0, 0)
+NOIR = (0,0,0)
 
 # Initialisation de la police
 font = pygame.font.Font("acadian_runes/police.ttf", 80)  
@@ -48,7 +49,11 @@ scene_courant = "Menu principal"
 credit_text = [
     "Jeu créé pour un projet de cours",
     "Développé par :",
-    "Nos noms",  
+    "Camilia ZARKI",
+    "Djahane ESCUDIE" ,
+    "Jack HOWARD",
+    "musique : 8 bit donjon de Kaden_Cook sur pixabay ",
+    "police d'écriture : Acadian Runes sur dafont.com"
 ]
 
 # Création d'une instance du jeu
@@ -86,12 +91,12 @@ while running:
 
     elif scene_courant == "Credit":
         #affiché les crédits : 
-        y_offset = 250  # Position de départ pour les crédits
+        y_offset = 210  # Position de départ pour les crédits
         for line in credit_text:
-            texte = font_credit.render(line, True, BLANC)
+            texte = font_credit.render(line, True, NOIR)
             text_rect = texte.get_rect(center=(540, y_offset))  
             screen.blit(texte, text_rect.topleft)
-            y_offset += 60  
+            y_offset += 50  
 
         # Afficher les options pour la sélection du nombre de joueurs
         for i, option in enumerate(options_credit):
