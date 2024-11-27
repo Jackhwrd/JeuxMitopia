@@ -1,35 +1,17 @@
 import pygame
 import random
+import numpy as np 
 
 from unit import *
 from game_map import *
 
 walls = mur()
+rooms = generate_rooms()
 
 class Game:
-    """
-    Classe pour représenter le jeu.
-
-    ...
-    Attributs
-    ---------
-    screen: pygame.Surface
-        La surface de la fenêtre du jeu.
-    player_units : list[Unit]
-        La liste des unités du joueur.
-    enemy_units : list[Unit]
-        La liste des unités de l'adversaire.
-    """
-
+   
     def __init__(self, screen):
-        """
-        Construit le jeu avec la surface de la fenêtre.
-
-        Paramètres
-        ----------
-        screen : pygame.Surface
-            La surface de la fenêtre du jeu.
-        """
+        
         self.screen = screen
         self.player_units = [Unit(0, 0, 10, 2, 'player'),
                              Unit(1, 0, 10, 2, 'player'),
@@ -39,6 +21,12 @@ class Game:
                             Unit(7, 6, 8, 1, 'enemy'),
                             Unit(8, 6, 8, 1, 'enemy')]
         
+        # Prépare les rectangles pour les cellules de la grille
+        self.grid_rects = [
+            pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            for x in range(0, WIDTH, CELL_SIZE)
+            for y in range(0, HEIGHT, CELL_SIZE)
+        ]
         
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -73,6 +61,7 @@ class Game:
                             dy = 1
 
                         selected_unit.move(dx, dy)
+                        
                         if any(
                             pygame.Rect(
                                 selected_unit.x * CELL_SIZE,
@@ -116,12 +105,19 @@ class Game:
 
     def flip_display(self):
         """Affiche le jeu."""
-
+        
         # Affiche la grille
-        self.screen.fill(RED)
+        self.screen.fill(RED)     
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
+                grid_x, grid_y = x // CELL_SIZE, y // CELL_SIZE
+            
+                # Obtenir la couleur de la cellule
+                color = get_cell_color(grid_x, grid_y, rooms, walls)
+                    
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
+                pygame.draw.rect(self.screen, color, rect)
+                
                 pygame.draw.rect(self.screen, BLACK, rect, 1)
 
         # Affiche les unités
@@ -131,11 +127,7 @@ class Game:
         # Affiche les murs
         for wall in walls:
             pygame.draw.rect(self.screen, BLACK, wall)  # Dessiner les murs
-        
-        # Affiche le joueur
-       # pygame.draw.rect(self.screen, (255, 0, 0), player)  # Dessiner le joueur
-
-        
+              
         
         # Rafraîchit l'écran
         pygame.display.flip()
@@ -158,7 +150,6 @@ def main():
     while True:
         game.handle_player_turn()
         game.handle_enemy_turn()
-        clock.tick(30)
-
+        
 if __name__ == "__main__":
     main()
