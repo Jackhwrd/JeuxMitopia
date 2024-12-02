@@ -6,7 +6,7 @@ from unit import *
 from game_map import *
 
 walls = mur()
-rooms = generate_rooms()
+rooms = generate_rooms(salles)
 
 class Game:
    
@@ -113,7 +113,7 @@ class Game:
                 grid_x, grid_y = x // CELL_SIZE, y // CELL_SIZE
             
                 # Obtenir la couleur de la cellule
-                color = get_cell_color(grid_x, grid_y, rooms, walls)
+                color = get_cell_color(grid_x, grid_y, rooms, walls, salles)
                     
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
                 pygame.draw.rect(self.screen, color, rect)

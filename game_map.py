@@ -49,9 +49,9 @@ def mur():
 
     return walls
 
-def generate_rooms():
+def generate_rooms(salles):
     """
-    Divise la grille en quatre salles en utilisant NumPy.
+    Divise la grille en cinq salles en utilisant NumPy.
     Retourne un tableau NumPy représentant les salles.
     """
     rooms = np.zeros((GRID_SIZE_H, GRID_SIZE_V), dtype=int)
@@ -60,18 +60,19 @@ def generate_rooms():
     for x in range(GRID_SIZE_H):
         for y in range(GRID_SIZE_V):
             if (x < mid_x and y < 7) or (x < 15 and y < mid_y):
-                rooms[x, y] = 1  # Salle 1 (haut gauche)
+                rooms[x, y] = salles[0].id  # Salle 1 (haut gauche)
             elif (x > mid_x and y < 7) or (x >= mid_x + 6 and y < mid_y):
-                rooms[x, y] = 2  # Salle 2 (haut droit)
-            elif (x < mid_x and y > mid_y + 6) or (x < 15 and y > mid_y):
-                rooms[x, y] = 3  # Salle 3 (bas gauche)
-            elif (x > mid_x and y > mid_y + 6) or (x >= mid_x + 6 and y > mid_y):
-                rooms[x, y] = 4  # Salle 4 (bas droit)
+                rooms[x, y] = salles[1].id  # Salle 2 (haut droit)
+            elif (x < mid_x and y >= mid_y + 6) or (x < 15 and y > mid_y):
+                rooms[x, y] = salles[2].id  # Salle 3 (bas gauche)
+            elif (x > mid_x and y >= mid_y + 6) or (x >= mid_x + 6 and y > mid_y):
+                rooms[x, y] = salles[3].id  # Salle 4 (bas droit)
             else:
-                rooms[x, y] = 5  # Salle 5 (arène)
+                rooms[x, y] = salles[4].id  # Salle 5 (arène)
 
     return rooms
 
+# détection des murs
 def is_near_wall(grid_x, grid_y, walls):
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # haut, bas, gauche, droite
         for dx, dy in directions:
@@ -82,38 +83,35 @@ def is_near_wall(grid_x, grid_y, walls):
                 return True
         return False
     
-def get_cell_color(grid_x, grid_y, rooms, walls):
+def get_cell_color(grid_x, grid_y, rooms, walls, salles):
 
-    room = rooms[grid_x, grid_y]
+    room_id = rooms[grid_x, grid_y]
     default_color = RED  
+  
+    # Trouver la salle correspondant à l'ID
+    salle = next((s for s in salles if s.id == room_id), None)
 
-    # Couleurs basées sur les salles
-    room_colors = {
-        1: KAKI,  # gris clair
-        2: (255, 50, 0),  # Vert clair
-        3: (255, 100, 0),  # Bleu clair
-        4: (255, 150, 0),  # Jaune clair
-        5: default_color,
-    }
-    
-    # Couleur pour les murs
-    wall_color = BLACK
+    # Si aucune salle n'est trouvée, retourner une couleur par défaut
+    if not salle:
+        return default_color
+
+    # Vérifier si la cellule est un mur
+    cell_rect = pygame.Rect(grid_x * CELL_SIZE, grid_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    if any(cell_rect.colliderect(wall) for wall in walls):
+        return BLACK  # Couleur des murs
 
     # Vérifier si la cellule est dans la salle 1 et si elle est proche d'un mur
-    if room == 1:
+    if room_id == 1:
         if is_near_wall(grid_x, grid_y, walls):
             return BROWN  # Marron (couleur Kaki) pour les cellules voisines des murs dans la salle 1
 
     #if room == 5:
-        
-
-    # Si la cellule est un mur, retourne la couleur des murs
-    cell_rect = pygame.Rect(grid_x * CELL_SIZE, grid_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-    if any(cell_rect.colliderect(wall) for wall in walls):
-        return wall_color
+    # Si la salle a un piège et est proche d'un mur
+    if salle.piège and is_near_wall(grid_x, grid_y, walls):
+        return BROWN  # Couleur pour une cellule piège  
 
     # Sinon, retourne la couleur de la salle
-    return room_colors.get(room, default_color)  
+    return salle.couleur  
 
         
 
@@ -122,3 +120,38 @@ def get_cell_color(grid_x, grid_y, rooms, walls):
 
 
       #  def passages_secrets ():
+class salle :
+        def __init__(self, id, couleur, piège=False, enemy=None, artefact=None):
+            """def __init__(self, id, couleur, piège=False, ennemis=None, artefact=None):
+        
+        Initialise une salle avec ses caractéristiques.
+        - id: identifiant de la salle (1, 2, 3, etc.)
+        - couleur: couleur de la salle.
+        - piège: booléen, s'il y a un piège dans la salle.
+        - ennemis: liste ou nombre d'ennemis dans la salle.
+        - artefact: description ou booléen pour savoir si un artefact est présent.
+        """
+            self.id = id
+            self.couleur = couleur
+            self.piège = piège
+            self.enemy = enemy if enemy is not None else []
+            self.artefact = artefact
+
+        def afficher_infos(self):
+            """Affiche les informations sur la salle."""
+            print(f"Salle {self.id}:")
+            print(f"  Piège: {'Oui' if self.piège else 'Non'}")
+            print(f"  Ennemis: {self.enemy}")
+            print(f"  Artefact: {self.artefact if self.artefact else 'Aucun'}")
+
+
+cave = salle(1, KAKI, False, 3, None)
+sellier = salle(2, BROWN, False, 3, None)
+cuisines = salle(3, WHITE, False, 3, None)
+ecuries = salle(4, YELLOW, False, 3, None)
+arene = salle(5, RED, False, 3, None)
+
+salles = [cave, sellier, cuisines, ecuries, arene]
+
+for salle in salles:
+    salle.afficher_infos()
