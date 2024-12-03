@@ -113,7 +113,17 @@ def get_cell_color(grid_x, grid_y, rooms, walls, salles):
     # Sinon, retourne la couleur de la salle
     return salle.couleur  
 
-        
+def teleport_unit(unit, target_pos):
+    """
+    Téléporte une unité à une position cible.
+
+    Args:
+        unit (Unit): L'unité à téléporter.
+        target_pos (tuple): Position cible (x, y) en cellules.
+    """
+    unit.x, unit.y = target_pos
+    print(f"L'unité {unit} a été téléportée à {target_pos} !")
+
 
        # def piège ():  --> augmenter les probas d'avoir un piège au fur et à mesure des niveaux
 

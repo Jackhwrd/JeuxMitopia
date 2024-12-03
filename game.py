@@ -55,6 +55,12 @@ class Game:
                             dx = -1
                         elif event.key == pygame.K_RIGHT:
                             dx = 1
+                            # Téléportation si en haut à droite
+                            if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
+                                teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
+                                self.flip_display()
+                                has_acted = True
+                                continue
                         elif event.key == pygame.K_UP:
                             dy = -1
                         elif event.key == pygame.K_DOWN:
