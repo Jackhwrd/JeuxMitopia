@@ -21,7 +21,7 @@ class Game:
         La liste des unités de l'adversaire.
     """
 
-    def __init__(self, screen):
+    def __init__(self, screen,player_count):
         """
         Construit le jeu avec la surface de la fenêtre.
 
@@ -31,13 +31,10 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 'player'),
-                             Unit(1, 0, 10, 2, 'player'),
-                             Unit(2, 0, 10, 2, 'player')]
+        
+        self.player_units = [Unit(i, 0, 10, 2, 'player') for i in range(player_count)]
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
-                            Unit(7, 6, 8, 1, 'enemy'),
-                            Unit(8, 6, 8, 1, 'enemy')]
+        self.enemy_units = [Unit(i+6, 0, 10, 2, 'enemy') for i in range(player_count)]
         
         
     def handle_player_turn(self):
@@ -152,13 +149,13 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
-    game = Game(screen)
+    game = Game(screen,2)
 
     # Boucle principale du jeu
     while True:
         game.handle_player_turn()
         game.handle_enemy_turn()
-        clock.tick(30)
+        clock.tick(FPS)
 
 if __name__ == "__main__":
     main()

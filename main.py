@@ -1,5 +1,6 @@
 import pygame
 from game import Game  # Assurez-vous que le fichier "game.py" contient la classe Game
+from unit import *
 
 # Initialisation des modules Pygame
 pygame.init()
@@ -49,15 +50,15 @@ scene_courant = "Menu principal"
 credit_text = [
     "Jeu créé pour un projet de cours",
     "Développé par :",
-    "Camilia ZARKI",
-    "Djahane ESCUDIE" ,
     "Jack HOWARD",
+    "Camilia ZARKI",
+    "Djahane ESCUDIE",
     "musique : 8 bit donjon de Kaden_Cook sur pixabay ",
     "police d'écriture : Acadian Runes sur dafont.com"
 ]
 
 # Création d'une instance du jeu
-game = Game()
+#game = Game(screen)
 
 # Boucle principale
 running = True
@@ -144,9 +145,26 @@ while running:
                     selected_option = (selected_option - 1) % len(options_perso)  # Revenir à l'option précédente
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  # Nombre de joueurs est 2
-                        game.nombre_joueur = 2
+                    
+                        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                        pygame.display.set_caption("Mon jeu de stratégie")
+                        game = Game(screen,2)
+                        In_Game = True
+                        while In_Game:
+                            game.handle_player_turn()
+                            game.handle_enemy_turn()
+                            if event.type == pygame.Keydown
+                            
                     elif selected_option == 1:  # Nombre de joueurs est 3
-                        game.nombre_joueur = 3
+                        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                        pygame.display.set_caption("Mon jeu de stratégie")
+                        game = Game(screen,3)
+                        In_Game = True
+                        while True:
+                            game.handle_player_turn()
+                            game.handle_enemy_turn()
+                            if event.type
+                            
                     elif selected_option == 2 : 
                         scene_courant = "Menu principal"
 
