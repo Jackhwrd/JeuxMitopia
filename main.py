@@ -51,7 +51,7 @@ options_credit =["retour"]
 scene_courant = "Menu principal"
 
 #choix des perso : 
-list_joueur = ["Croque - Minou","Croque - Minou","Croque - Minou","Menue principal"]
+list_joueur = ["Mage","Guerrier","Vampire","Menue principal"]
 #chargement des images et redimmensionnement pour le menu de selection
 image_croque_minou = pygame.image.load("image/Croque_minou.png")
 
@@ -85,8 +85,23 @@ credit_text = [
 ]
 
 # Création d'une instance du jeu
-game = Game(screen)
+#game = Game(screen)
 
+def jeux_video(perso_joueurs):
+
+    # Instanciation de la fenêtre
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Mon jeu de stratégie")
+
+    # Instanciation du jeu
+    game = Game(screen,perso_joueurs)
+
+    # Boucle principale du jeu
+    In_Game = True
+    while In_Game:
+        game.handle_player_turn()
+        game.handle_enemy_turn()
+    
 # Boucle principale
 running = True
 while running:
@@ -300,13 +315,13 @@ while running:
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
                         choix_j3 = list_joueur [0]
-                        scene_courant = "Menu principal"
+                        jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 1:  
                         choix_j3 = list_joueur [1]
-                        scene_courant = "Menu principal"
+                        jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 2:  
                         choix_j3 = list_joueur [2]
-                        scene_courant = "Menu principal"
+                        jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"
                         

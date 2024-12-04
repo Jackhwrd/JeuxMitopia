@@ -10,12 +10,13 @@ rooms = generate_rooms(salles)
 
 class Game:
    
-    def __init__(self, screen):
+    def __init__(self, screen,personnages):
         
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 'player', "Guerrier"),
-                             Unit(1, 0, 10, 2, 'player', "Mage"),
-                             Unit(2, 0, 10, 2, 'player', "Vampire")]
+        self.perso = personnages
+        self.player_units = [Unit(0, 0, 10, 2, 'player', personnages[0]),
+                             Unit(1, 0, 10, 2, 'player', personnages[1]),
+                             Unit(2, 0, 10, 2, 'player', personnages[2])]
 
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire"),
                             Unit(7, 6, 8, 1, 'enemy',"Vampire"),
@@ -150,7 +151,8 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
-    game = Game(screen)
+    Perso = ["Mage","Guerrier","Vampire"]
+    game = Game(screen,Perso)
 
     # Boucle principale du jeu
     while True:
