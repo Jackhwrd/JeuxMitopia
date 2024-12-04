@@ -1,5 +1,6 @@
 import pygame
 import random
+from image import *
 
 # Constantes
 GRID_SIZE_V = 24
@@ -8,18 +9,14 @@ CELL_SIZE = 30
 WIDTH = GRID_SIZE_H * CELL_SIZE
 HEIGHT = GRID_SIZE_V * CELL_SIZE
 FPS = 30
-
-# Couleurs
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)           #base RVB
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-OLIVE = (128, 128, 0)
-BROWN = (131, 118, 105)
-YELLOW = (255, 255, 0)
-LIGHT_YELLOW = (255, 255, 153)
-KAKI = (140, 130, 80)
+
+
+
 
 class Unit:
     """
@@ -74,6 +71,7 @@ class Unit:
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
+        self.character_image = image_croque_minou
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -89,8 +87,21 @@ class Unit:
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
         color = BLUE if self.team == 'player' else BLACK
-        if self.is_selected:
-            pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
-                             self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-                           2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+   
+        # Affiche le cadre vert si l'unité est sélectionnée
+        
+        # Affiche l'image du personnage
+        if self.character_image:
+            # Dessine l'image du personnage
+            screen.blit(pygame.transform.scale(self.character_image, (CELL_SIZE, CELL_SIZE)),
+                        (self.x * CELL_SIZE, self.y * CELL_SIZE))
+        else:
+            # Optionnel : Affiche un cercle ou une couleur par défaut si aucune image n'est définie
+            color = BLUE if self.team == 'player' else BLACK
+            pygame.draw.circle(screen, color, 
+                            (self.x * CELL_SIZE + CELL_SIZE // 2, 
+                                self.y * CELL_SIZE + CELL_SIZE // 2), 
+                            CELL_SIZE // 3)
+
+
+
