@@ -20,7 +20,28 @@ BROWN = (131, 118, 105)
 YELLOW = (255, 255, 0)
 LIGHT_YELLOW = (255, 255, 153)
 KAKI = (140, 130, 80)
+MAGE = (182,37,207)
+GUERRIER = (138,148,163)
+VAMPIRE = (161,0,0)
 
+
+class Role:
+
+    def __init__(self,titre):
+        self.__titre = titre 
+    
+    def get_titre(self):
+        return self.__titre
+        
+    def get_attacks(self):
+        if self.__titre == "Guerrier":
+            attacks = {"A" : ("Slam", 2)}
+        elif self.__titre == "Mage":
+            attacks = {"A" : ("Fireball", 2)}
+        elif self.__titre == "Vampire":
+            attacks = {"A" : ("Drain", 2)}
+        return attacks
+    
 class Unit:
     """
     Classe pour représenter une unité.
@@ -51,7 +72,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power, team):
+    def __init__(self, x, y, health, attack_power, team, role):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -74,6 +95,7 @@ class Unit:
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
+        self.role = Role(role) 
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -88,7 +110,8 @@ class Unit:
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else BLACK
+        titre = self.role.get_titre()
+        color = BLACK if self.team == 'enemy' else MAGE if titre == "Mage" else GUERRIER if titre == "Guerrier" else VAMPIRE
         if self.is_selected:
             pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
                              self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))

@@ -13,13 +13,13 @@ class Game:
     def __init__(self, screen):
         
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 'player'),
-                             Unit(1, 0, 10, 2, 'player'),
-                             Unit(2, 0, 10, 2, 'player')]
+        self.player_units = [Unit(0, 0, 10, 2, 'player', "Guerrier"),
+                             Unit(1, 0, 10, 2, 'player', "Mage"),
+                             Unit(2, 0, 10, 2, 'player', "Vampire")]
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
-                            Unit(7, 6, 8, 1, 'enemy'),
-                            Unit(8, 6, 8, 1, 'enemy')]
+        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire"),
+                            Unit(7, 6, 8, 1, 'enemy',"Vampire"),
+                            Unit(8, 6, 8, 1, 'enemy',"Vampire")]
         
         # Prépare les rectangles pour les cellules de la grille
         self.grid_rects = [

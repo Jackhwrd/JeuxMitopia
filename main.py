@@ -1,5 +1,6 @@
 import pygame
-from game import Game  
+from game import Game  # Assurez-vous que le fichier "game.py" contient la classe Game
+from unit import *
 
 # Initialisation des modules Pygame
 pygame.init()
@@ -76,9 +77,9 @@ choix_j3 = ""
 credit_text = [
     "Jeu créé pour un projet de cours",
     "Développé par :",
-    "Camilia ZARKI",
-    "Djahane ESCUDIE" ,
     "Jack HOWARD",
+    "Camilia ZARKI",
+    "Djahane ESCUDIE",
     "musique : 8 bit donjon de Kaden_Cook sur pixabay ",
     "police d'écriture : Acadian Runes sur dafont.com"
 ]
