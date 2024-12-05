@@ -36,7 +36,9 @@ class Game:
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
             selected_unit.is_selected = True
-            self.flip_display()
+            attacking = False
+            Attack = Attaque(NULL[0],NULL[1],NULL[2],NULL[3],NULL[4],NULL[5])
+            self.flip_display(attacking,Attack)
             while not has_acted:
 
                 # Important: cette boucle permet de gérer les événements Pygame
@@ -52,23 +54,23 @@ class Game:
 
                         # Déplacement (touches fléchées)
                         dx, dy = 0, 0
-                        if event.key == pygame.K_LEFT:
+                        if event.key == pygame.K_LEFT and attacking == False:
                             dx = -1
-                        elif event.key == pygame.K_RIGHT:
+                        elif event.key == pygame.K_RIGHT and attacking == False:
                             dx = 1
                             # Téléportation si en haut à droite
                             if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
                                 teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
-                                self.flip_display()
+                                self.flip_display(attacking,Attack)
                                 has_acted = True
                                 continue
-                        elif event.key == pygame.K_UP:
+                        elif event.key == pygame.K_UP and attacking == False:
                             dy = -1
-                        elif event.key == pygame.K_DOWN:
+                        elif event.key == pygame.K_DOWN and attacking ==  False:
                             dy = 1
 
                         selected_unit.move(dx, dy)
-                        
+                                                
                         if any(
                             pygame.Rect(
                                 selected_unit.x * CELL_SIZE,
@@ -81,10 +83,23 @@ class Game:
                                 print("Collision détectée !")
                                 # Annuler le mouvement si nécessaire
                                 selected_unit.move(-dx, -dy)
+
+                        #si un joueur appui sur une touche d'attaque
+                        if (event.key == pygame.K_a) or (event.key == pygame.K_z) or (event.key == pygame.K_e) and not(attacking):
+                            attacking = True
+                            name, value, height, width = selected_unit.role.get_attacks()[event.key]
+                            Attack = Attaque( name, value, height, width, selected_unit.x, selected_unit.y)
+                            print("Attack ", name, "activé !")  #print le nom de l'attaque choisi
+
+                        #appui sur une la touche espace pour annuler l'attaque
+                        if (event.key == pygame.K_SPACE) and attacking:
+                            Attack = Attaque(NULL[0],NULL[1],NULL[2],NULL[3],NULL[4],NULL[5])
+                            attacking = False
+                            print("attaque annulé")
+
                         
-                        self.flip_display()
                         # Attaque (touche espace) met fin au tour
-                        if event.key == pygame.K_SPACE:
+                        elif event.key == pygame.K_SPACE and not(attacking):
                             for enemy in self.enemy_units:
                                 if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
                                     selected_unit.attack(enemy)
@@ -93,6 +108,8 @@ class Game:
 
                             has_acted = True
                             selected_unit.is_selected = False
+                            
+                        self.flip_display(attacking,Attack)
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -110,7 +127,7 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
 
-    def flip_display(self):
+    def flip_display(self,attacking,Attack):
         """Affiche le jeu."""
         
         # Affiche la grille
@@ -135,6 +152,8 @@ class Game:
         for wall in walls:
             pygame.draw.rect(self.screen, BLACK, wall)  # Dessiner les murs
               
+        if attacking:
+            Attack.draw(self.screen)
         
         # Rafraîchit l'écran
         pygame.display.flip()

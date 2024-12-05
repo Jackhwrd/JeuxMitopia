@@ -23,10 +23,10 @@ KAKI = (140, 130, 80)
 MAGE = (182,37,207)
 GUERRIER = (138,148,163)
 VAMPIRE = (161,0,0)
+NULL = ("Null", 0, 0, 0, 0, 0)
 
 
 class Role:
-
     def __init__(self,titre):
         self.__titre = titre 
     
@@ -35,13 +35,28 @@ class Role:
         
     def get_attacks(self):
         if self.__titre == "Guerrier":
-            attacks = {"A" : ("Slam", 2)}
+            attacks = {pygame.K_a : ("Slam", 2, 1, 1)}
         elif self.__titre == "Mage":
-            attacks = {"A" : ("Fireball", 2)}
+            attacks = {pygame.K_a : ("Fireball", 2, 1, 1)}
         elif self.__titre == "Vampire":
-            attacks = {"A" : ("Drain", 2)}
+            attacks = {pygame.K_a : ("Drain", 2, 1, 1)}
         return attacks
     
+class Attaque:
+    def __init__(self, name, value, height, width, x, y):
+        self.name = name
+        self.value = value
+        self.height = height
+        self.width = width
+        self.x = x
+        self.y = y
+
+    def draw(self,screen):
+        pygame.draw.rect(screen, RED, (self.x * CELL_SIZE,self.y * CELL_SIZE, self.height * CELL_SIZE, self.width * CELL_SIZE))
+
+
+
+
 class Unit:
     """
     Classe pour représenter une unité.
