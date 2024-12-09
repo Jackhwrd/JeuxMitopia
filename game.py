@@ -37,7 +37,7 @@ class Game:
             has_acted = False
             selected_unit.is_selected = True
             attacking = False
-            Attack = Attaque(NULL[0],NULL[1],NULL[2],NULL[3],NULL[4],NULL[5])
+            Attack = Attaque(NULL[0],NULL[1],NULL[2],NULL[3],NULL[4],NULL[5],NULL[6])
             self.flip_display(attacking,Attack)
             while not has_acted:
 
@@ -76,10 +76,12 @@ class Game:
                                 selected_unit.is_selected = False
                                 continue
 
-                        
                         elif attacking == True:
                             
                             Attack.move(dx,dy)
+
+                            if abs(Attack.x - selected_unit.x) >= Attack.range or abs(Attack.y - selected_unit.y) >= Attack.range:
+                                Attack.move(-dx,-dy)
                                                 
                         if any(
                             pygame.Rect(
@@ -97,13 +99,13 @@ class Game:
                         #si un joueur appui sur une touche d'attaque
                         if (event.key == pygame.K_a) or (event.key == pygame.K_z) or (event.key == pygame.K_e) and not(attacking):
                             attacking = True
-                            name, value, height, width = selected_unit.role.get_attacks()[event.key]
-                            Attack = Attaque( name, value, height, width, selected_unit.x, selected_unit.y)
+                            name, value, height, width, range= selected_unit.role.get_attacks()[event.key]
+                            Attack = Attaque( name, value, height, width, range, selected_unit.x, selected_unit.y)
                             print("Attack ", name, "activé !")  #print le nom de l'attaque choisi
 
                         #appui sur une la touche espace pour annuler l'attaque
                         if (event.key == pygame.K_SPACE) and attacking:
-                            Attack = Attaque(NULL[0],NULL[1],NULL[2],NULL[3],NULL[4],NULL[5])
+                            Attack = Attaque(NULL[0],NULL[1],NULL[2],NULL[3],NULL[4],NULL[5],NULL[6])
                             attacking = False
                             print("attaque annulé")
 

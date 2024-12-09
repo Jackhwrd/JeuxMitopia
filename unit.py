@@ -23,7 +23,7 @@ KAKI = (140, 130, 80)
 MAGE = (182,37,207)
 GUERRIER = (138,148,163)
 VAMPIRE = (161,0,0)
-NULL = ("Null", 0, 0, 0, 0, 0)
+NULL = ("Null", 0, 0, 0, 0, 0, 0)
 
 
 class Role:
@@ -35,28 +35,29 @@ class Role:
         
     def get_attacks(self):
         if self.__titre == "Guerrier":
-            attacks = {pygame.K_a : ("Slam", 2, 1, 1)}
+            attacks = {pygame.K_a : ("Slam", 2, 1, 1, 5)}
         elif self.__titre == "Mage":
-            attacks = {pygame.K_a : ("Fireball", 2, 1, 1)}
+            attacks = {pygame.K_a : ("Fireball", 2, 1, 1, 5)}
         elif self.__titre == "Vampire":
-            attacks = {pygame.K_a : ("Drain", 2, 1, 1)}
+            attacks = {pygame.K_a : ("Drain", 2, 1, 1, 5)}
         return attacks
     
 class Attaque:
-    def __init__(self, name, value, height, width, x, y):
+    def __init__(self, name, value, height, width, r, x, y):
         self.name = name
         self.value = value
         self.height = height
         self.width = width
         self.x = x
         self.y = y
+        self.range = r 
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
         if 0 <= self.x + dx < GRID_SIZE_H and 0 <= self.y + dy < GRID_SIZE_V:
             self.x += dx
             self.y += dy
-            
+
     def draw(self,screen):
         pygame.draw.rect(screen, RED, (self.x * CELL_SIZE,self.y * CELL_SIZE, self.height * CELL_SIZE, self.width * CELL_SIZE))
 
