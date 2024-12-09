@@ -1,5 +1,6 @@
 import pygame
 import random
+from image import *
 
 # Constantes
 GRID_SIZE_V = 24

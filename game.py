@@ -179,7 +179,7 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
-    Perso = [Guerrier(0, 0, 10, 2, 'player', "Guerrier"),Guerrier(1, 0, 10, 2, 'player', "Guerrier"),Vampire(2, 0, 10, 2, 'player', "Vampire")]
+    Perso = [Mage(0, 0, 10, 2, 'player', "Mage"),Guerrier(1, 0, 10, 2, 'player', "Guerrier"),Vampire(2, 0, 10, 2, 'player', "Vampire")]
     game = Game(screen,Perso)
 
     # Boucle principale du jeu

@@ -1,6 +1,7 @@
 import pygame
-from game import Game  # Assurez-vous que le fichier "game.py" contient la classe Game
+from game import *  
 from unit import *
+from image import *
 
 # Initialisation des modules Pygame
 pygame.init()
@@ -26,6 +27,7 @@ NOIR = (0,0,0)
 
 # Initialisation de la police
 font = pygame.font.Font("acadian_runes/police.ttf", 80)  
+
 
 # Initialisation de la police pour les crédits (pour que le texte soit plus petit)
 font_credit = pygame.font.Font("acadian_runes/police.ttf", 40)
@@ -84,6 +86,25 @@ credit_text = [
     "police d'écriture : Acadian Runes sur dafont.com"
 ]
 
+#choix des perso : 
+list_joueur = ["Croque - Minou","Guts","Batorie","Menue principal"]
+#chargement des images et redimmensionnement pour le menu de selection
+
+
+nouvelle_largeur = 100 
+nouvelle_hauteur = 100  
+new_croque_minou = pygame.transform.scale(image_croque_minou, (nouvelle_largeur, nouvelle_hauteur))
+
+image_vide = pygame.Surface((1, 1), pygame.SRCALPHA)
+image_vide.fill((0, 0, 0, 0))  # Remplir avec une transparence complète (RGBA : alpha = 0)
+
+list_image = [
+    new_croque_minou,
+    new_croque_minou,
+    new_croque_minou,
+    image_vide
+]
+
 # Création d'une instance du jeu
 #game = Game(screen)
 
@@ -109,6 +130,9 @@ while running:
     screen.blit(arriere_plan, (0, 0))
 
     if scene_courant == "Menu principal":
+        #initialisation du choix des personnages
+        player_images = []
+        player_classe = []
         # Afficher les options principales
         for i, option in enumerate(options):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
@@ -196,6 +220,48 @@ while running:
         text_rect = texte.get_rect(center=(540, 700))  
         screen.blit(texte, text_rect.topleft)
 
+    elif scene_courant == "selection_perso1":
+        texte = font.render("Joueur 1 choisie ton perso", True, BLANC)
+        text_rect = texte.get_rect(center=(540, 210 ))
+        screen.blit(texte, text_rect.topleft)
+        for i, option in enumerate(list_joueur):
+            color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
+            texte = font.render(option, True, color)
+            text_rect = texte.get_rect(center=(540, 300 + i * 110))  # Espacement vertical entre les options
+            screen.blit(texte, text_rect.topleft)
+
+            image = list_image[i]
+            image_rect = image.get_rect(midleft=(text_rect.right + 20, text_rect.centery))  # Décale l'image à droite du texte
+            screen.blit(image, image_rect.topleft)
+
+    elif scene_courant == "selection_perso2":
+        texte = font.render("Joueur 2 choisie ton perso", True, BLANC)
+        text_rect = texte.get_rect(center=(540, 210 ))
+        screen.blit(texte, text_rect.topleft)
+        for i, option in enumerate(list_joueur):
+            color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
+            texte = font.render(option, True, color)
+            text_rect = texte.get_rect(center=(540, 300 + i * 110))  # Espacement vertical entre les options
+            screen.blit(texte, text_rect.topleft)
+
+            image = list_image[i]
+            image_rect = image.get_rect(midleft=(text_rect.right + 20, text_rect.centery))  # Décale l'image à droite du texte
+            screen.blit(image, image_rect.topleft)
+        
+    elif scene_courant == "selection_perso3":
+        texte = font.render("Joueur 3 choisie ton perso", True, BLANC)
+        text_rect = texte.get_rect(center=(540, 210 ))
+        screen.blit(texte, text_rect.topleft)
+        for i, option in enumerate(list_joueur):
+            color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
+            texte = font.render(option, True, color)
+            text_rect = texte.get_rect(center=(540, 300 + i * 110))  # Espacement vertical entre les options
+            screen.blit(texte, text_rect.topleft)
+
+            image = list_image[i]
+            image_rect = image.get_rect(midleft=(text_rect.right + 20, text_rect.centery))  # Décale l'image à droite du texte
+            screen.blit(image, image_rect.topleft)
+
 
     # Mettre à jour l'écran
     pygame.display.flip()
@@ -265,7 +331,6 @@ while running:
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  # retour en arrière
                         scene_courant = "Menu principal"
-
 
         elif scene_courant == "selection_perso1":
             if event.type == pygame.KEYDOWN:
