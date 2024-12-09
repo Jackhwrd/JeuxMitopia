@@ -54,22 +54,32 @@ class Game:
 
                         # Déplacement (touches fléchées)
                         dx, dy = 0, 0
-                        if event.key == pygame.K_LEFT and attacking == False:
+                        if event.key == pygame.K_LEFT:
                             dx = -1
-                        elif event.key == pygame.K_RIGHT and attacking == False:
+                        elif event.key == pygame.K_RIGHT:
                             dx = 1
                             # Téléportation si en haut à droite
+                        elif event.key == pygame.K_UP:
+                            dy = -1
+                        elif event.key == pygame.K_DOWN:
+                            dy = 1
+
+                        if attacking == False:
+
+                            selected_unit.move(dx,dy)
+
                             if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
                                 teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
                                 self.flip_display(attacking,Attack)
+                                dx, dy = 0,0
                                 has_acted = True
+                                selected_unit.is_selected = False
                                 continue
-                        elif event.key == pygame.K_UP and attacking == False:
-                            dy = -1
-                        elif event.key == pygame.K_DOWN and attacking ==  False:
-                            dy = 1
 
-                        selected_unit.move(dx, dy)
+                        
+                        elif attacking == True:
+                            
+                            Attack.move(dx,dy)
                                                 
                         if any(
                             pygame.Rect(

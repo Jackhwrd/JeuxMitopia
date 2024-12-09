@@ -51,6 +51,12 @@ class Attaque:
         self.x = x
         self.y = y
 
+    def move(self, dx, dy):
+        """Déplace l'unité de dx, dy."""
+        if 0 <= self.x + dx < GRID_SIZE_H and 0 <= self.y + dy < GRID_SIZE_V:
+            self.x += dx
+            self.y += dy
+            
     def draw(self,screen):
         pygame.draw.rect(screen, RED, (self.x * CELL_SIZE,self.y * CELL_SIZE, self.height * CELL_SIZE, self.width * CELL_SIZE))
 
