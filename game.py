@@ -3,6 +3,8 @@ import random
 
 from unit import *
 from game_map import *
+from image import *
+from classes import *
 
 walls = mur()
 
@@ -20,21 +22,41 @@ class Game:
     enemy_units : list[Unit]
         La liste des unités de l'adversaire.
     """
+    
 
-    def __init__(self, screen,player_count):
+    def __init__(self, screen, player_count,player_classe):
         """
-        Construit le jeu avec la surface de la fenêtre.
-
-        Paramètres
-        ----------
-        screen : pygame.Surface
-            La surface de la fenêtre du jeu.
+        Initialise le jeu avec les paramètres nécessaires.
         """
         self.screen = screen
-        
-        self.player_units = [Unit(i, 0, 10, 2, 'player') for i in range(player_count)]
+        self.enemy_images = [image_mechant_guerier, image_mechant_vampire, image_mechant_mage]
+        self.player_class = player_classe # liste des classes des joueurs 
 
-        self.enemy_units = [Unit(i+6, 0, 10, 2, 'enemy') for i in range(player_count)]
+        self.player_units = []
+        for i, player_class in enumerate(player_classe):
+            if player_class == "Mage":
+                    self.player_units.append(Mage_player(0, i, 10, 3, image_croque_minou, 2, 5))
+            elif player_class == "Vampire":
+                    self.player_units.append(Vampire_player(0, i, 8, 4, image_croque_minou, 3, 6))
+            elif player_class == "Guerrier":
+                    self.player_units.append(Guerrier_player(0, i, 12, 2, image_croque_minou, 4, 4))
+
+
+        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire",0,0),
+                            Unit(7, 6, 8, 1, 'enemy',"Vampire",0,0),
+                            Unit(8, 6, 8, 1, 'enemy',"Vampire",0,0)]
+       
+
+        # Associer les images des ennemis
+        for unit, image in zip(self.enemy_units, self.enemy_images):
+            unit.character_image = image
+
+        # Prépare les rectangles pour les cellules de la grille
+        self.grid_rects = [
+            pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            for x in range(0, WIDTH, CELL_SIZE)
+            for y in range(0, HEIGHT, CELL_SIZE)
+        ]
         
         
     def handle_player_turn(self):
@@ -132,11 +154,10 @@ class Game:
         # Affiche le joueur
        # pygame.draw.rect(self.screen, (255, 0, 0), player)  # Dessiner le joueur
 
-        
-        
         # Rafraîchit l'écran
         pygame.display.flip()
 
+    
 
 def main():
 
@@ -149,7 +170,7 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
-    game = Game(screen,2)
+    game = Game(screen,3)
 
     # Boucle principale du jeu
     while True:
