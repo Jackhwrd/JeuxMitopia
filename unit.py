@@ -24,6 +24,14 @@ MAGE = (182,37,207)
 GUERRIER = (138,148,163)
 VAMPIRE = (161,0,0)
 NULL = ("Null", 0, 0, 0, 0, 0, 0)
+IMAGE = None
+IMAGE_CROQUE_MINOU = None
+IMAGE_MECHANT_MAGE = None
+IMAGE_MECHANT_GUERRIER = None
+IMAGE_MECHANT_VAMPIRE = None
+IMAGE_ROI = None
+IMAGE_STATUS = None
+
 
 
 class Role:
@@ -94,7 +102,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power, team, role):
+    def __init__(self, x, y, health, attack_power, team, role, image_player = IMAGE, image_enemy = IMAGE, defense = 0, vitesse = 0):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -118,6 +126,10 @@ class Unit:
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
         self.role = Role(role) 
+        self.image_player = image_player
+        self.image_enemy = image_enemy
+        self.defense = defense
+        self.vitesse = vitesse
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -130,12 +142,58 @@ class Unit:
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
             target.health -= self.attack_power
 
+    def get_attacks(self):
+        print("mavais code")
+        pass
+
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        titre = self.role.get_titre()
-        color = BLACK if self.team == 'enemy' else MAGE if titre == "Mage" else GUERRIER if titre == "Guerrier" else VAMPIRE
-        if self.is_selected:
-            pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
-                             self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
+        if self.image_enemy != None or self.image_player!= None:
+            image = self.image_player if self.team == 'player' else self.image_enemy
+            if self.is_selected:
+                pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                
+            screen.blit(pygame.transform.scale(image , (CELL_SIZE, CELL_SIZE)),(self.x * CELL_SIZE, self.y * CELL_SIZE))
+
+        else: 
+            titre = self.role.get_titre()
+            color = BLACK if self.team == 'enemy' else MAGE if titre == "Mage" else GUERRIER if titre == "Guerrier" else VAMPIRE
+            if self.is_selected:
+                pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
+                                self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
                            2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+        
+
+
+
+class Vampire(Unit):
+
+    def __init__(self, x, y, health, attack_power, team, role):
+        super().__init__(x, y, health, attack_power, team, role, IMAGE_CROQUE_MINOU,IMAGE_MECHANT_MAGE)
+
+    
+    def get_attacks(self):
+        attacks = {pygame.K_a : ("Drain", 2, 1, 1, 5), pygame.K_z: ("TBD", 2, 1, 1, 5), pygame.K_e : ("TBD", 2, 1, 1, 5)}
+        return attacks
+
+
+class Guerrier(Unit):
+
+    def __init__(self, x, y, health, attack_power, team, role):
+        super().__init__(x, y, health, attack_power, team, role, IMAGE, IMAGE_MECHANT_GUERRIER)
+        
+
+    def get_attacks(self):
+        attacks = {pygame.K_a : ("Slam", 2, 1, 1, 5), pygame.K_z: ("TBD", 2, 1, 1, 5), pygame.K_e : ("TBD", 2, 1, 1, 5)}
+        return attacks
+
+
+class Mage(Unit):
+
+    def __init__(self, x, y, health, attack_power, team, role):
+        super().__init__(x, y, health, attack_power, team, role, IMAGE, IMAGE_MECHANT_VAMPIRE)
+        
+    def get_attacks(self):
+        attacks = {pygame.K_a : ("Fireball", 2, 1, 1, 5), pygame.K_z: ("TBD", 2, 1, 1, 5), pygame.K_e : ("TBD", 2, 1, 1, 5)}
+        return attacks

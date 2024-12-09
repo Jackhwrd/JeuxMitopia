@@ -69,9 +69,9 @@ list_image = [
     image_vide
 ]
 #sauvegarde du choix des persos, à changer par la suite 
-choix_j1 = ""
-choix_j2 = ""
-choix_j3 = ""
+choix_j1 = None
+choix_j2 = None
+choix_j3 = None
 
 # Le texte des crédits, divisé en plusieurs lignes
 credit_text = [
@@ -275,13 +275,14 @@ while running:
                     selected_option = (selected_option - 1) % len(list_joueur)  # Revenir à l'option précédente
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
-                        choix_j1 = list_joueur [0]
+                        choix_j1 = Mage(0, 0, 10, 2, 'player', list_joueur[0])
+                        #print(type(choix_j1))
                         scene_courant = "selection_perso2"
                     elif selected_option == 1:  
-                        choix_j1 = list_joueur [1]
+                        choix_j1 = Guerrier(0, 0, 10, 2, 'player', list_joueur[1])
                         scene_courant = "selection_perso2"
                     elif selected_option == 2:  
-                        choix_j1 = list_joueur [2]
+                        choix_j1 = Vampire(0, 0, 10, 2, 'player', list_joueur[2])
                         scene_courant = "selection_perso2"
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"
@@ -295,13 +296,13 @@ while running:
                     selected_option = (selected_option - 1) % len(list_joueur)  # Revenir à l'option précédente
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
-                        choix_j2 = list_joueur [0]
+                        choix_j2 = Mage(1, 0, 10, 2, 'player', list_joueur[0])
                         scene_courant = "selection_perso3"
                     elif selected_option == 1:  
-                        choix_j2 = list_joueur [1]
+                        choix_j2 = Guerrier(1, 0, 10, 2, 'player', list_joueur[1])
                         scene_courant = "selection_perso3"
                     elif selected_option == 2:  
-                        choix_j2 = list_joueur [2]
+                        choix_j2 = Vampire(1, 0, 10, 2, 'player', list_joueur[2])
                         scene_courant = "selection_perso3"
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"
@@ -314,13 +315,13 @@ while running:
                         selected_option = (selected_option - 1) % len(list_joueur)  # Navigue dans `list_joueur`
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
-                        choix_j3 = list_joueur [0]
+                        choix_j3 = Mage(2, 0, 10, 2, 'player', list_joueur[0])
                         jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 1:  
-                        choix_j3 = list_joueur [1]
+                        choix_j3 = Guerrier(2, 0, 10, 2, 'player', list_joueur[1])
                         jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 2:  
-                        choix_j3 = list_joueur [2]
+                        choix_j3 = Vampire(2, 0, 10, 2, 'player', list_joueur[2])
                         jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"

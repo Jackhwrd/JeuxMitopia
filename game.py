@@ -13,10 +13,7 @@ class Game:
     def __init__(self, screen,personnages):
         
         self.screen = screen
-        self.perso = personnages
-        self.player_units = [Unit(0, 0, 10, 2, 'player', personnages[0]),
-                             Unit(1, 0, 10, 2, 'player', personnages[1]),
-                             Unit(2, 0, 10, 2, 'player', personnages[2])]
+        self.player_units = personnages
 
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire"),
                             Unit(7, 6, 8, 1, 'enemy',"Vampire"),
@@ -99,7 +96,7 @@ class Game:
                         #si un joueur appui sur une touche d'attaque
                         if (event.key == pygame.K_a) or (event.key == pygame.K_z) or (event.key == pygame.K_e) and not(attacking):
                             attacking = True
-                            name, value, height, width, range= selected_unit.role.get_attacks()[event.key]
+                            name, value, height, width, range= selected_unit.get_attacks()[event.key]
                             Attack = Attaque( name, value, height, width, range, selected_unit.x, selected_unit.y)
                             print("Attack ", name, "activé !")  #print le nom de l'attaque choisi
 
@@ -182,7 +179,7 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
-    Perso = ["Mage","Guerrier","Vampire"]
+    Perso = [Guerrier(0, 0, 10, 2, 'player', "Guerrier"),Guerrier(1, 0, 10, 2, 'player', "Guerrier"),Vampire(2, 0, 10, 2, 'player', "Vampire")]
     game = Game(screen,Perso)
 
     # Boucle principale du jeu
