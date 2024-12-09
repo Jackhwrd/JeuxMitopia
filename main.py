@@ -34,6 +34,8 @@ font_credit = pygame.font.Font("acadian_runes/police.ttf", 40)
 
 font_j = pygame.font.Font("acadian_runes/police.ttf", 20)
 
+font_i = pygame.font.Font("acadian_runes/police.ttf", 10)
+
 
 
 # Options du menu
@@ -52,14 +54,11 @@ options_credit =["retour"]
 # Définition de la scène en cours
 scene_courant = "Menu principal"
 
-#choix des perso : 
-list_joueur = ["Mage","Guerrier","Vampire","Menue principal"]
 #chargement des images et redimmensionnement pour le menu de selection
-image_croque_minou = pygame.image.load("image/Croque_minou.png")
 
 nouvelle_largeur = 100 
 nouvelle_hauteur = 100  
-new_croque_minou = pygame.transform.scale(image_croque_minou, (nouvelle_largeur, nouvelle_hauteur))
+new_croque_minou = pygame.transform.scale(IMAGE_CROQUE_MINOU, (nouvelle_largeur, nouvelle_hauteur))
 
 image_vide = pygame.Surface((1, 1), pygame.SRCALPHA)
 image_vide.fill((0, 0, 0, 0))  # Remplir avec une transparence complète (RGBA : alpha = 0)
@@ -70,6 +69,7 @@ list_image = [
     new_croque_minou,
     image_vide
 ]
+
 #sauvegarde du choix des persos, à changer par la suite 
 choix_j1 = None
 choix_j2 = None
@@ -87,26 +87,10 @@ credit_text = [
 ]
 
 #choix des perso : 
-list_joueur = ["Croque - Minou","Guts","Batorie","Menue principal"]
+list_joueur = ["Croque - Minou","Guts","Bayonetta","Menue principal"]
 #chargement des images et redimmensionnement pour le menu de selection
 
 
-nouvelle_largeur = 100 
-nouvelle_hauteur = 100  
-new_croque_minou = pygame.transform.scale(image_croque_minou, (nouvelle_largeur, nouvelle_hauteur))
-
-image_vide = pygame.Surface((1, 1), pygame.SRCALPHA)
-image_vide.fill((0, 0, 0, 0))  # Remplir avec une transparence complète (RGBA : alpha = 0)
-
-list_image = [
-    new_croque_minou,
-    new_croque_minou,
-    new_croque_minou,
-    image_vide
-]
-
-# Création d'une instance du jeu
-#game = Game(screen)
 
 def jeux_video(perso_joueurs):
 
@@ -220,6 +204,10 @@ while running:
         text_rect = texte.get_rect(center=(540, 700))  
         screen.blit(texte, text_rect.topleft)
 
+        texte = font_i.render("(elle aurait pue m'aider aussi wsh)", True, NOIR)
+        text_rect = texte.get_rect(center=(540, 712))  
+        screen.blit(texte, text_rect.topleft)
+
     elif scene_courant == "selection_perso1":
         texte = font.render("Joueur 1 choisie ton perso", True, BLANC)
         text_rect = texte.get_rect(center=(540, 210 ))
@@ -292,22 +280,7 @@ while running:
                         print("Jeu quitté !")
                         running = False
                         pygame.quit()
-        
-       # elif scene_courant == "selection_perso":
-           # if event.type == pygame.KEYDOWN:
-            #    if event.key == pygame.K_DOWN:  # Flèche bas
-             #       selected_option = (selected_option + 1) % len(options_perso)  # Passer à l'option suivante
-              #  elif event.key == pygame.K_UP:  # Flèche haut
-               #     selected_option = (selected_option - 1) % len(options_perso)  # Revenir à l'option précédente
-                #elif event.key == pygame.K_RETURN:  # Touche Entrée
-                 #   if selected_option == 0:  # Nombre de joueurs est 2
-                  #      game.nombre_joueur = 2
-                   #     scene_courant = ""
-                    #elif selected_option == 1:  # Nombre de joueurs est 3
-                     #   game.nombre_joueur = 3
-                    #elif selected_option == 2 : 
-                     #   scene_courant = "Menu principal"
-                        
+
 
         elif scene_courant == "Menu son":
             if event.type == pygame.KEYDOWN:
@@ -340,14 +313,14 @@ while running:
                     selected_option = (selected_option - 1) % len(list_joueur)  # Revenir à l'option précédente
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
-                        choix_j1 = Mage(0, 0, 10, 2, 'player', list_joueur[0])
+                        choix_j1 = Mage(0, 0, 10, 2, 'player')
                         #print(type(choix_j1))
                         scene_courant = "selection_perso2"
                     elif selected_option == 1:  
-                        choix_j1 = Guerrier(0, 0, 10, 2, 'player', list_joueur[1])
+                        choix_j1 = Guerrier(0, 0, 10, 2, 'player')
                         scene_courant = "selection_perso2"
                     elif selected_option == 2:  
-                        choix_j1 = Vampire(0, 0, 10, 2, 'player', list_joueur[2])
+                        choix_j1 = Vampire(0, 0, 10, 2, 'player')
                         scene_courant = "selection_perso2"
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"
@@ -361,13 +334,13 @@ while running:
                     selected_option = (selected_option - 1) % len(list_joueur)  # Revenir à l'option précédente
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
-                        choix_j2 = Mage(1, 0, 10, 2, 'player', list_joueur[0])
+                        choix_j2 = Mage(1, 0, 10, 2, 'player')
                         scene_courant = "selection_perso3"
                     elif selected_option == 1:  
-                        choix_j2 = Guerrier(1, 0, 10, 2, 'player', list_joueur[1])
+                        choix_j2 = Guerrier(1, 0, 10, 2, 'player')
                         scene_courant = "selection_perso3"
                     elif selected_option == 2:  
-                        choix_j2 = Vampire(1, 0, 10, 2, 'player', list_joueur[2])
+                        choix_j2 = Vampire(1, 0, 10, 2, 'player')
                         scene_courant = "selection_perso3"
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"
@@ -380,13 +353,13 @@ while running:
                         selected_option = (selected_option - 1) % len(list_joueur)  # Navigue dans `list_joueur`
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
-                        choix_j3 = Mage(2, 0, 10, 2, 'player', list_joueur[0])
+                        choix_j3 = Mage(2, 0, 10, 2, 'player')
                         jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 1:  
-                        choix_j3 = Guerrier(2, 0, 10, 2, 'player', list_joueur[1])
+                        choix_j3 = Guerrier(2, 0, 10, 2, 'player')
                         jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 2:  
-                        choix_j3 = Vampire(2, 0, 10, 2, 'player', list_joueur[2])
+                        choix_j3 = Vampire(2, 0, 10, 2, 'player')
                         jeux_video([choix_j1,choix_j2,choix_j3])
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"

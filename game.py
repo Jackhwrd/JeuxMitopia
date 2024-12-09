@@ -15,9 +15,9 @@ class Game:
         self.screen = screen
         self.player_units = personnages
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire"),
-                            Unit(7, 6, 8, 1, 'enemy',"Vampire"),
-                            Unit(8, 6, 8, 1, 'enemy',"Vampire")]
+        self.enemy_units = [Vampire(6, 6, 8, 1, 'enemy'),
+                            Vampire(7, 6, 8, 1, 'enemy'),
+                            Vampire(8, 6, 8, 1, 'enemy')]
         
         # Prépare les rectangles pour les cellules de la grille
         self.grid_rects = [
@@ -179,7 +179,7 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
-    Perso = [Mage(0, 0, 10, 2, 'player', "Mage"),Guerrier(1, 0, 10, 2, 'player', "Guerrier"),Vampire(2, 0, 10, 2, 'player', "Vampire")]
+    Perso = [Mage(0, 0, 10, 2, 'player'),Guerrier(1, 0, 10, 2, 'player'),Vampire(2, 0, 10, 2, 'player')]
     game = Game(screen,Perso)
 
     # Boucle principale du jeu
