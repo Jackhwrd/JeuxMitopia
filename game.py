@@ -91,7 +91,7 @@ class Game:
 
                     # Afficher les attaques si le joueur choisit d'attaquer
                     else:
-                        self.flip_display(attacking=False, Attack=None)
+                        
                         for i, attack in enumerate(selected_unit.liste_attaque):
                             color = BLUE if i == selected_attack else WHITE
                             texte = font.render(attack, True, color)
@@ -127,9 +127,11 @@ class Game:
                                         # Permet au joueur de déplacer l'unité
                                         self.move_unit_multiple(selected_unit)
                                         has_acted = True
+                                        self.flip_display(attacking=False, Attack=None)
                                     elif current_option == 1:  # Attaquer
                                         print("Choix : Attaquer")
                                         selecting_attack = True
+                                        self.flip_display(attacking=False, Attack=None)
                                 else:
                                     print(f"Attaque choisie : {selected_unit.liste_attaque[selected_attack]}")
                                     # Effectue l'attaque (logique à implémenter)
@@ -178,10 +180,16 @@ class Game:
                         unit.x, unit.y = target_x, target_y
                         return
 
-    def move_unit(self, unit):
-        """Déplacement de l'unité par le joueur."""
+    def move_unit_multiple(self, unit):
+        """Permet au joueur de déplacer l'unité vers une position cible."""
+        target_x, target_y = unit.x, unit.y  # Position actuelle
         while True:
+            # Afficher la grille avec la position cible surlignée
             self.flip_display(attacking=False, Attack=None)
+            highlight_rect = pygame.Rect(target_x * CELL_SIZE, target_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(self.screen, YELLOW, highlight_rect, 3)  # Surligne la position cible
+            pygame.display.flip()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -197,20 +205,35 @@ class Game:
                     elif event.key == pygame.K_DOWN:
                         dy = 1
 
-                    # Appliquer le déplacement si possible
-                    unit.move(dx, dy)
-                    self.flip_display(attacking=False, Attack=None)
-                    return
+                    # Mettre à jour la position cible
+                    new_x, new_y = target_x + dx, target_y + dy
+                    # Vérification si la nouvelle position est valide (pas un mur)
+                    if 0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V and not self.is_wall(new_x, new_y):
+                        target_x, target_y = new_x, new_y
+
+                    # Valider le déplacement
+                    if event.key == pygame.K_RETURN:
+                        unit.x, unit.y = target_x, target_y
+                        return
+
+    def is_wall(self, x, y):
+        """Vérifie si une case donnée contient un mur."""
+        for wall in walls:
+            if wall.collidepoint(x * CELL_SIZE, y * CELL_SIZE):
+                return True
+        return False
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
         for enemy in self.enemy_units:
-
             # Déplacement aléatoire
             target = random.choice(self.player_units)
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-            enemy.move(dx, dy)
+            
+            new_x, new_y = enemy.x + dx, enemy.y + dy
+            if 0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V and not self.is_wall(new_x, new_y):
+                enemy.move(dx, dy)
 
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
@@ -234,12 +257,12 @@ class Game:
                     
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
                 pygame.draw.rect(self.screen, color, rect)
-                
-                pygame.draw.rect(self.screen, BLACK, rect, 1)
 
-        # Affiche les murs
-        for wall in walls:
-            pygame.draw.rect(self.screen, BLACK, wall)  # Dessiner les murs
+                # Ne pas dessiner la grille pour les cases de murs
+                if self.is_wall(grid_x, grid_y):
+                    pygame.draw.rect(self.screen, BLACK, rect)  # Dessiner les murs
+
+                pygame.draw.rect(self.screen, BLACK, rect, 1)
 
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
@@ -249,8 +272,6 @@ class Game:
         if attacking:
             Attack.draw(self.screen)
 
-    
-        
         # Rafraîchissement de l'écran
         pygame.display.flip()
 
