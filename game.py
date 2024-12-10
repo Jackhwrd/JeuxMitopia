@@ -69,31 +69,33 @@ class Game:
                 current_option = 0  # 0 = Avancer, 1 = Attaquer
                 selecting_attack = False  # False = choisir action, True = choisir attaque
                 selected_attack = 0  # Index de l'attaque choisie (si applicable)
-
+                # Efface l'écran et dessine le plateau de jeu
+                self.flip_display(attacking=False, Attack=None)
                 while not has_acted:
-                    # Efface l'écran et dessine le plateau de jeu
-                    self.flip_display(attacking=False, Attack=None)
+                    
 
                     # Afficher un message pour le joueur actuel
                     joueur_text = f"Joueur {player_index + 1}, à toi de jouer !"
                     texte_joueur = font.render(joueur_text, True, WHITE)
-                    self.screen.blit(texte_joueur, (WIDTH // 2 - 100, 20))
+                    text_rect = texte_joueur.get_rect(center=(WIDTH // 2, 70))  # Centre le texte horizontalement à 30 pixels du haut
+                    self.screen.blit(texte_joueur, text_rect)
 
                     # Afficher les options principales (Avancer ou Attaquer)
                     if not selecting_attack:
                         options = ["Avancer", "Attaquer"]
                         for i, option in enumerate(options):
-                            color = BLACK if i == current_option else WHITE
+                            color = BLUE if i == current_option else WHITE
                             texte = font.render(option, True, color)
-                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 50))
+                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
                             self.screen.blit(texte, text_rect)
 
                     # Afficher les attaques si le joueur choisit d'attaquer
                     else:
+                        self.flip_display(attacking=False, Attack=None)
                         for i, attack in enumerate(selected_unit.liste_attaque):
-                            color = BLACK if i == selected_attack else WHITE
+                            color = BLUE if i == selected_attack else WHITE
                             texte = font.render(attack, True, color)
-                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 50))
+                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
                             self.screen.blit(texte, text_rect)
 
                     pygame.display.flip()
@@ -216,15 +218,17 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
 
-    def flip_display(self,attacking,Attack):
+    def flip_display(self, attacking, Attack):
         """Affiche le jeu."""
-        
+
+        # Effacer l'écran (en dehors de la boucle principale pour éviter les flashs)
+        self.screen.fill(RED)
+
         # Affiche la grille
-        self.screen.fill(RED)     
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
                 grid_x, grid_y = x // CELL_SIZE, y // CELL_SIZE
-            
+                
                 # Obtenir la couleur de la cellule
                 color = get_cell_color(grid_x, grid_y, rooms, walls, salles)
                     
@@ -233,18 +237,21 @@ class Game:
                 
                 pygame.draw.rect(self.screen, BLACK, rect, 1)
 
+        # Affiche les murs
+        for wall in walls:
+            pygame.draw.rect(self.screen, BLACK, wall)  # Dessiner les murs
+
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
         
-        # Affiche les murs
-        for wall in walls:
-            pygame.draw.rect(self.screen, BLACK, wall)  # Dessiner les murs
-              
+        # Afficher les attaques si nécessaire
         if attacking:
             Attack.draw(self.screen)
+
+    
         
-        # Rafraîchit l'écran
+        # Rafraîchissement de l'écran
         pygame.display.flip()
 
 
