@@ -2,43 +2,6 @@ import pygame
 import random
 from image import *
 
-# Constantes
-GRID_SIZE_V = 24
-GRID_SIZE_H = 40
-CELL_SIZE = 30
-WIDTH = GRID_SIZE_H * CELL_SIZE
-HEIGHT = GRID_SIZE_V * CELL_SIZE
-FPS = 30
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)           #base RVB
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-
-
-# Constantes
-GRID_SIZE_V = 24
-GRID_SIZE_H = 40
-CELL_SIZE = 30
-WIDTH = GRID_SIZE_H * CELL_SIZE
-HEIGHT = GRID_SIZE_V * CELL_SIZE
-FPS = 30
-
-# Couleurs
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)           #base RVB
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-OLIVE = (128, 128, 0)
-BROWN = (131, 118, 105)
-YELLOW = (255, 255, 0)
-LIGHT_YELLOW = (255, 255, 153)
-KAKI = (140, 130, 80)
-MAGE = (182,37,207)
-GUERRIER = (138,148,163)
-VAMPIRE = (161,0,0)
-
 
 class Unit:
     """

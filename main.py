@@ -12,29 +12,9 @@ pygame.display.set_caption("Menu interactif")
 screen = pygame.display.set_mode((1080, 720))
 
 # Chargement de l'arrière-plan
-arriere_plan = pygame.image.load("image/ecran_titre.JPG")
+
 arriere_plan = pygame.transform.scale(arriere_plan, (1080, 720))
 
-# Chargement de la musique
-music = pygame.mixer.Sound('musique/ambiance.mp3')
-music.play(loops=-1)  # Répéter la musique en boucle
-music.set_volume(0.1)
-
-# Couleurs
-BLANC = (255, 255, 255)
-ROUGE = (255, 0, 0)
-NOIR = (0,0,0)
-
-# Initialisation de la police
-font = pygame.font.Font("acadian_runes/police.ttf", 80)  
-
-
-# Initialisation de la police pour les crédits (pour que le texte soit plus petit)
-font_credit = pygame.font.Font("acadian_runes/police.ttf", 40)  
-
-
-
-font_j = pygame.font.Font("acadian_runes/police.ttf", 20)
 
 # Options du menu
 options = ["Jouer", "Son", "Crédit","Quitter"]
@@ -81,9 +61,11 @@ list_image = [
     new_croque_minou,
     image_vide
 ]
+# Chargement de la musique
+music = pygame.mixer.Sound('musique/ambiance.mp3')
+music.play(loops=-1)  
+music.set_volume(0.1)
 
-# Création d'une instance du jeu
-#game = Game(screen)
 
 # Boucle principale
 running = True
@@ -92,8 +74,8 @@ while running:
     screen.blit(arriere_plan, (0, 0))
 
     if scene_courant == "Menu principal":
+        
         #initialisation du choix des personnages
-        player_images = []
         player_classe = []
         # Afficher les options principales
         for i, option in enumerate(options):

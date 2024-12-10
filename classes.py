@@ -5,7 +5,6 @@ from unit import *
 
 class Mage_player(Unit):
     def __init__(self, x, y, health, attack_power, image, defe, vit):
-        
         super().__init__(x, y, health, attack_power, 'player', image, defe, vit)
         self.liste_attaque = ["Longue attaque", "Régène", "Bouclier"]
 
