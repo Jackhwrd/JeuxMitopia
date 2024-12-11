@@ -145,41 +145,7 @@ class Game:
                         pygame.time.Clock().tick(FPS)
 
 
-    def move_unit_multiple(self, unit):
-        """Permet au joueur de déplacer l'unité vers une position cible."""
-        target_x, target_y = unit.x, unit.y  # Position actuelle
-        while True:
-            # Afficher la grille avec la position cible surlignée
-            self.flip_display(attacking=False, Attack=None)
-            highlight_rect = pygame.Rect(target_x * CELL_SIZE, target_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            pygame.draw.rect(self.screen, YELLOW, highlight_rect, 3)  # Surligne la position cible
-            pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                if event.type == pygame.KEYDOWN:
-                    dx, dy = 0, 0
-                    if event.key == pygame.K_LEFT:
-                        dx = -1
-                    elif event.key == pygame.K_RIGHT:
-                        dx = 1
-                    elif event.key == pygame.K_UP:
-                        dy = -1
-                    elif event.key == pygame.K_DOWN:
-                        dy = 1
-
-                    # Mettre à jour la position cible
-                    new_x, new_y = target_x + dx, target_y + dy
-                    if 0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V:
-                        target_x, target_y = new_x, new_y
-
-                    # Valider le déplacement
-                    if event.key == pygame.K_RETURN:
-                        unit.x, unit.y = target_x, target_y
-                        return
-
+    
     def move_unit_multiple(self, unit):
         """Permet au joueur de déplacer l'unité vers une position cible."""
         target_x, target_y = unit.x, unit.y  # Position actuelle
@@ -274,6 +240,12 @@ class Game:
 
         # Rafraîchissement de l'écran
         pygame.display.flip()
+
+    def game_over() :
+        pass 
+        
+    def victoire() : 
+        pass
 
 
 def main():

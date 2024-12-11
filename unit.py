@@ -89,3 +89,10 @@ class Unit:
                             (self.x * CELL_SIZE + CELL_SIZE // 2, 
                                 self.y * CELL_SIZE + CELL_SIZE // 2), 
                             CELL_SIZE // 3)
+            
+    def health(self,degat) : 
+
+        pass 
+
+    def update_health_bar():
+        pass 
