@@ -104,7 +104,6 @@ while running:
         #affiché les crédits : 
         y_offset = 210  # Position de départ pour les crédits
         for line in credit_text:
-            texte = font_credit.render(line, True, NOIR)
             text_rect = texte.get_rect(center=(540, y_offset))  
             screen.blit(texte, text_rect.topleft)
             y_offset += 50  
