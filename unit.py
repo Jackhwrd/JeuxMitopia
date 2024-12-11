@@ -5,7 +5,7 @@ from image import *
 
 class Unit:
 
-    def __init__(self, x, y, health, attack_power, team,image,defe,vit,niveau = 1, niveau=1):
+    def __init__(self, x, y, health, attack_power, team,image,defe,vit,niveau = 1):
         
         self.x = x
         self.y = y
