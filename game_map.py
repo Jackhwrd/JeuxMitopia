@@ -229,4 +229,4 @@ arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
 salles = [cave, sellier, cuisines, ecuries, arene]
 
 for salle in salles:
-    salle.afficher_infos
+    salle.afficher_infos()

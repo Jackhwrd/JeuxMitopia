@@ -34,6 +34,10 @@ class Game:
         self.enemy_images = [image_mechant_guerier, image_mechant_vampire, image_mechant_mage]
         self.player_class = player_classe # liste des classes des joueurs 
 
+        self.walls = mur()
+        self.rooms = generate_rooms(salles)
+        self.objects = generate_objects()
+
         self.player_units = []
         for i, player_class in enumerate(player_classe):
             if player_class == "Mage":
@@ -243,7 +247,7 @@ class Game:
                 grid_x, grid_y = x // CELL_SIZE, y // CELL_SIZE
                 
                 # Obtenir la couleur de la cellule
-                color = get_cell_color(grid_x, grid_y, rooms, walls, salles)
+                color = get_cell_color(grid_x, grid_y, self.rooms, self.walls, salles)
                     
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
                 pygame.draw.rect(self.screen, color, rect)
@@ -252,7 +256,11 @@ class Game:
                 if self.is_wall(grid_x, grid_y):
                     pygame.draw.rect(self.screen, BLACK, rect)  # Dessiner les murs
 
-                pygame.draw.rect(self.screen, BLACK, rect, 1)
+                pygame.draw.rect(self.screen, BLACK, rect, 1) #grille
+
+        # Affiche les objets
+        for obj in self.objects:
+            obj.draw(self.screen)
 
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
