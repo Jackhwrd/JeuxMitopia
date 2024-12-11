@@ -166,8 +166,8 @@ def generate_objects():
     """
     objets = [
         GameObject(4, 4, 'Clef', GREEN, WHITE),  # Exemple : une épée
-        GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE)  # badge
-        #GameObject(8, 10, 'potion', LIGHT_YELLOW, BLACK)  # Exemple : une potion
+        GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE),  # badge
+        GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', LIGHT_YELLOW, BLACK)  #pass
     ]
     return objets
 
@@ -204,6 +204,9 @@ class salle :
             if condition == "Badge" and not any(obj.name == "Badge" for obj in unit.has_object):
                 print("Condition manquante : badge requis.")
                 return False
+            if condition == "Pierre de téléportation" and not any(obj.name == "Pierre de téléportation" for obj in unit.has_object):
+                print("Condition manquante : Pierre de téléportation requise.")
+                return False
            
             if condition == "niveau_min" and unit.niveau < valeur:
                 print(f"Condition manquante : niveau {valeur} requis.")
@@ -214,10 +217,12 @@ class salle :
 # Création d'un objet GameObject
 clef = GameObject(4, 4, 'Clef', GREEN, WHITE)
 badge = GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE)
+pierre = GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', LIGHT_YELLOW, BLACK)  #pass
+
 
 cave = salle(1, KAKI, False, 3, objet=clef)
-sellier = salle(2, BROWN, False, 3, conditions={"Badge": True})
-cuisines = salle(3, WHITE, False, 3)
+sellier = salle(2, BROWN, False, 3, objet=pierre, conditions={"Badge": True})
+cuisines = salle(3, WHITE, False, 3, conditions={"Pierre de téléportation": True})
 ecuries = salle(4, YELLOW, False, 3)
 arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
 
