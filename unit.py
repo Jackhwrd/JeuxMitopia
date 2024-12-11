@@ -33,7 +33,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power, team,image,defe,vit):
+    def __init__(self, x, y, health, attack_power, team,image,defe,vit,niveau = 1):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -59,6 +59,8 @@ class Unit:
         self.character_image = image
         self.defense = defe
         self.vitess = vit
+        self.has_object = []
+        self.niveau = niveau  # Niveau du joueur
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -89,6 +91,16 @@ class Unit:
                             (self.x * CELL_SIZE + CELL_SIZE // 2, 
                                 self.y * CELL_SIZE + CELL_SIZE // 2), 
                             CELL_SIZE // 3)
+            
+    def augmenter_niveau(self):
+        self.niveau += 1
+        print(f"Votre niveau a augmenté : {self.niveau}")
+
+    def collect(self, obj):
+        # Si l'objet n'est pas déjà dans la liste, on l'ajoute
+        if obj.name not in [o.name for o in self.has_object]:
+            self.has_object.append(obj)
+            print(f"Vous avez ramassé : {obj.name}!")
             
     def health(self,degat) : 
 

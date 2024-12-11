@@ -59,90 +59,114 @@ class Game:
             for x in range(0, WIDTH, CELL_SIZE)
             for y in range(0, HEIGHT, CELL_SIZE)
         ]
+
+        self.screen = screen
+        self.walls = mur()
+        self.rooms = generate_rooms(salles)
+        self.objects = generate_objects()
         
         
     def handle_player_turn(self):
-            """Tour du joueur : choix d'actions (déplacement ou attaque)."""
-            for player_index, selected_unit in enumerate(self.player_units):
-                has_acted = False
-                selected_unit.is_selected = True
-                current_option = 0  # 0 = Avancer, 1 = Attaquer
-                selecting_attack = False  # False = choisir action, True = choisir attaque
-                selected_attack = 0  # Index de l'attaque choisie (si applicable)
-                # Efface l'écran et dessine le plateau de jeu
-                self.flip_display(attacking=False, Attack=None)
-                while not has_acted:
-                    
+        """Tour du joueur"""
+        for selected_unit in self.player_units:
 
-                    # Afficher un message pour le joueur actuel
-                    joueur_text = f"Joueur {player_index + 1}, à toi de jouer !"
-                    texte_joueur = font.render(joueur_text, True, WHITE)
-                    text_rect = texte_joueur.get_rect(center=(WIDTH // 2, 70))  # Centre le texte horizontalement à 30 pixels du haut
-                    self.screen.blit(texte_joueur, text_rect)
+            # Tant que l'unité n'a pas terminé son tour
+            has_acted = False
+            selected_unit.is_selected = True
+            self.flip_display()
+            while not has_acted:
 
-                    # Afficher les options principales (Avancer ou Attaquer)
-                    if not selecting_attack:
-                        options = ["Avancer", "Attaquer"]
-                        for i, option in enumerate(options):
-                            color = BLUE if i == current_option else WHITE
-                            texte = font.render(option, True, color)
-                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
-                            self.screen.blit(texte, text_rect)
+                # Important: cette boucle permet de gérer les événements Pygame
+                for event in pygame.event.get():
 
-                    # Afficher les attaques si le joueur choisit d'attaquer
-                    else:
+                    # Gestion de la fermeture de la fenêtre
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+
+                    # Gestion des touches du clavier
+                    if event.type == pygame.KEYDOWN:
+
+                        # Déplacement (touches fléchées)
+                        dx, dy = 0, 0
+                        if event.key == pygame.K_LEFT:
+                            dx = -1
+                        elif event.key == pygame.K_RIGHT:
+                            dx = 1
+                            # Téléportation si en haut à droite
+                            if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
+                                teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
+                                self.flip_display()
+                                has_acted = True
+                                continue
+                        elif event.key == pygame.K_UP:
+                            dy = -1
+                        elif event.key == pygame.K_DOWN:
+                            dy = 1
                         
-                        for i, attack in enumerate(selected_unit.liste_attaque):
-                            color = BLUE if i == selected_attack else WHITE
-                            texte = font.render(attack, True, color)
-                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
-                            self.screen.blit(texte, text_rect)
+                        new_x = selected_unit.x + dx
+                        new_y = selected_unit.y + dy
 
-                    pygame.display.flip()
+                        # Si la touche + est appuyée, essayer de ramasser un objet
+                        if event.key == pygame.K_KP_PLUS:  # Touche + du pavé numérique
+                            for obj in self.objects:
+                                if obj.x == selected_unit.x and obj.y == selected_unit.y:
+                                    print(f"Vous avez ramassé {obj.name} !")
+                                    obj.collected = True  # L'objet est ramassé
+                                    self.objects.remove(obj)  # Retirer de la carte
+                                    
+                                    # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
+                                    if not hasattr(selected_unit, 'has_object'):
+                                        selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
 
-                    # Gestion des événements
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            exit()
+                                    selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
+                                    print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
+                                    break 
 
-                        if event.type == pygame.KEYDOWN:
-                            # Navigation entre les options principales ou attaques
-                            if event.key == pygame.K_UP:
-                                if not selecting_attack:
-                                    current_option = (current_option - 1) % 2
-                                else:
-                                    selected_attack = (selected_attack - 1) % len(selected_unit.liste_attaque)
-                            elif event.key == pygame.K_DOWN:
-                                if not selecting_attack:
-                                    current_option = (current_option + 1) % 2
-                                else:
-                                    selected_attack = (selected_attack + 1) % len(selected_unit.liste_attaque)
+                        # Vérifier les collisions avec les murs
+                        proposed_rect = pygame.Rect(
+                            new_x * CELL_SIZE,
+                            new_y * CELL_SIZE,
+                            CELL_SIZE,
+                            CELL_SIZE,
+                        )
+                        if any(proposed_rect.colliderect(wall) for wall in self.walls):
+                            print("Collision détectée ! Mouvement annulé.")
+                            # Collision détectée : ne pas appliquer le déplacement
+                            continue
 
-                            # Validation du choix
-                            if event.key == pygame.K_RETURN:
-                                if not selecting_attack:
-                                    if current_option == 0:  # Avancer
-                                        print("Choix : Avancer")
-                                        # Permet au joueur de déplacer l'unité
-                                        self.move_unit_multiple(selected_unit)
-                                        has_acted = True
-                                        self.flip_display(attacking=False, Attack=None)
-                                    elif current_option == 1:  # Attaquer
-                                        print("Choix : Attaquer")
-                                        selecting_attack = True
-                                        self.flip_display(attacking=False, Attack=None)
-                                else:
-                                    print(f"Attaque choisie : {selected_unit.liste_attaque[selected_attack]}")
-                                    # Effectue l'attaque (logique à implémenter)
-                                    has_acted = True
+                        # Vérifier si le joueur tente d'entrer dans une salle
+                        room_id = (
+                            self.rooms[new_x, new_y]
+                            if (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V)
+                            else 0
+                        )
+                        salle = next((s for s in salles if s.id == room_id), None)
 
-                            # Annulation du choix d'attaque
-                            if event.key == pygame.K_BACKSPACE and selecting_attack:
-                                selecting_attack = False
+                        # Si le joueur entre dans une salle, vérifier les conditions
+                        if salle:
+                            if salle.verifier_conditions(selected_unit):
+                                selected_unit.x, selected_unit.y = new_x, new_y
+                                print(f"Vous êtes entré dans la salle {salle.id}.")
+                            else:
+                                print(f"Accès refusé à la salle {salle.id}.")
+                        else:
+                            # Pas de salle : déplacer normalement
+                            selected_unit.x, selected_unit.y = new_x, new_y
+                            
+                        self.flip_display()
+                        # Attaque (touche espace) met fin au tour
+                        if event.key == pygame.K_SPACE:
+                            for enemy in self.enemy_units:
+                                if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
+                                    selected_unit.attack(enemy)
+                                    if enemy.health <= 0:
+                                        self.enemy_units.remove(enemy)
 
-                        # Limiter le nombre d'images par seconde
-                        pygame.time.Clock().tick(FPS)
+                            has_acted = True
+                            selected_unit.is_selected = False
+
+    
 
 
     
@@ -207,7 +231,7 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
 
-    def flip_display(self, attacking, Attack):
+    def flip_display(self, attacking=False, Attack=None):
         """Affiche le jeu."""
 
         # Effacer l'écran (en dehors de la boucle principale pour éviter les flashs)
@@ -233,6 +257,10 @@ class Game:
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
+
+        # Affiche les objets
+        for obj in self.objects:
+            obj.draw(self.screen)
         
         # Afficher les attaques si nécessaire
         if attacking:
