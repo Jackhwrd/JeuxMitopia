@@ -77,8 +77,13 @@ class Game:
                                     print(f"Vous avez ramassé {obj.name} !")
                                     obj.collected = True  # L'objet est ramassé
                                     self.objects.remove(obj)  # Retirer de la carte
-                                    selected_unit.has_object = obj  # Associer l'objet à l'unité
-                                    print(f"L'objet dans has_object : {selected_unit.has_object.name}")  # Debug
+                                    
+                                    # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
+                                    if not hasattr(selected_unit, 'has_object'):
+                                        selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
+
+                                    selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
+                                    print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
                                     break 
 
                         # Vérifier les collisions avec les murs
@@ -155,7 +160,7 @@ class Game:
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
                 pygame.draw.rect(self.screen, color, rect)
                 
-                pygame.draw.rect(self.screen, BLACK, rect, 1)
+                pygame.draw.rect(self.screen, BLACK, rect, 1) #grille
 
         # Affiche les objets
         for obj in self.objects:

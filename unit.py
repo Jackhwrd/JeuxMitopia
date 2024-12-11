@@ -23,7 +23,7 @@ KAKI = (140, 130, 80)
 
 class Unit:
 
-    def __init__(self, x, y, health, attack_power, team, niveau=1, a_clef=False):
+    def __init__(self, x, y, health, attack_power, team, niveau=1, a_clef=False, a_badge=False):
         
         self.x = x
         self.y = y
@@ -32,7 +32,9 @@ class Unit:
         self.team = team  # 'player' ou 'enemy'
         self.niveau = niveau  # Niveau du joueur
         self.a_clef = a_clef  # Possession d'une clé
+        self.a_badge = a_badge  # Possession d'un badge
         self.is_selected = False
+        self.has_object = []
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -59,8 +61,15 @@ class Unit:
         print(f"Votre niveau a augmenté : {self.niveau}")
 
     def collect(self, obj):
+        
+        # Si l'objet n'est pas déjà dans la liste, on l'ajoute
+        if obj.name not in [o.name for o in self.has_object]:
+            self.has_object.append(obj)
+            print(f"Vous avez ramassé : {obj.name}!")
+        """
         if obj.name == "Clef":
-            self._unit.a_clef = True  # Le joueur a collecté la clé
-            self.has_object = obj  # Stocker l'objet dans has_object
-            print("Vous avez ramassé la clef!")
-
+            self.has_object.append(obj)  # Stocker l'objet
+            print(f"Vous avez ramassé : {obj.name}!")
+        elif obj.name == "Badge":
+            self.has_object.append(obj)  # Stocker l'objet
+            print(f"Vous avez ramassé : {obj.name}!")"""

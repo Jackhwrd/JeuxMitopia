@@ -4,11 +4,12 @@ import numpy as np
 
 from unit import *
 
+centre_x = GRID_SIZE_H//2
+centre_y = GRID_SIZE_V//2
+
 def mur():
     walls = []
     
-    centre_x = GRID_SIZE_H//2
-    centre_y = GRID_SIZE_V//2
 
     # Création d'une grille de coordonnées
     x, y = np.meshgrid(np.arange(GRID_SIZE_H), np.arange(GRID_SIZE_V))
@@ -165,13 +166,13 @@ def generate_objects():
     """
     objets = [
         GameObject(4, 4, 'Clef', GREEN, WHITE),  # Exemple : une épée
-        #GameObject(2, 6, 'clé magique', YELLOW, BLACK),  # Exemple : une clé magique
+        GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE)  # badge
         #GameObject(8, 10, 'potion', LIGHT_YELLOW, BLACK)  # Exemple : une potion
     ]
     return objets
 
 class salle :
-    def __init__(self, id, couleur, piège=False, enemy=None, artefact=None, conditions=None):
+    def __init__(self, id, couleur, piège=False, enemy=None, objet=None, conditions=None):
         """def __init__(self, id, couleur, piège=False, ennemis=None, artefact=None):
     
     Initialise une salle avec ses caractéristiques.
@@ -185,20 +186,25 @@ class salle :
         self.couleur = couleur
         self.piège = piège
         self.enemy = enemy if enemy is not None else []
-        self.artefact = artefact
+        self.objet = objet
         self.conditions = conditions if conditions else {}  # Assurez un dictionnaire
    
     def afficher_infos(self):
         print(f"Salle {self.id}:")
         print(f"  Piège: {'Oui' if self.piège else 'Non'}")
         print(f"  Ennemis: {self.enemy}")
-        print(f"  Artefact: {self.artefact if self.artefact else 'Aucun'}")
+        print(f"  Objet: {self.objet if self.objet else 'Aucun'}")
+        print(f"  Conditions : {self.conditions}")
 
     def verifier_conditions(self, unit):
         for condition, valeur in self.conditions.items():
-            if condition == unit.a_clef:
+            if condition == "Clef" and not any(obj.name == "Clef" for obj in unit.has_object):
                 print("Condition manquante : clef requise.")
                 return False
+            if condition == "Badge" and not any(obj.name == "Badge" for obj in unit.has_object):
+                print("Condition manquante : badge requis.")
+                return False
+           
             if condition == "niveau_min" and unit.niveau < valeur:
                 print(f"Condition manquante : niveau {valeur} requis.")
                 return False
@@ -206,13 +212,14 @@ class salle :
         return True
 
 # Création d'un objet GameObject
-clef = GameObject(4, 4, 'Clef', GREEN, WHITE),
+clef = GameObject(4, 4, 'Clef', GREEN, WHITE)
+badge = GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE)
 
-cave = salle(1, KAKI, False, 3, artefact=clef)
-sellier = salle(2, BROWN, False, 3, conditions={"Clef": True})
+cave = salle(1, KAKI, False, 3, objet=clef)
+sellier = salle(2, BROWN, False, 3, conditions={"Badge": True})
 cuisines = salle(3, WHITE, False, 3)
 ecuries = salle(4, YELLOW, False, 3)
-arene = salle(5, RED, False, 3)
+arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
 
 salles = [cave, sellier, cuisines, ecuries, arene]
 
