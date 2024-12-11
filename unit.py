@@ -22,57 +22,16 @@ LIGHT_YELLOW = (255, 255, 153)
 KAKI = (140, 130, 80)
 
 class Unit:
-    """
-    Classe pour représenter une unité.
 
-    ...
-    Attributs
-    ---------
-    x : int
-        La position x de l'unité sur la grille.
-    y : int
-        La position y de l'unité sur la grille.
-    health : int
-        La santé de l'unité.
-    attack_power : int
-        La puissance d'attaque de l'unité.
-    team : str
-        L'équipe de l'unité ('player' ou 'enemy').
-    is_selected : bool
-        Si l'unité est sélectionnée ou non.
-
-    Méthodes
-    --------
-    move(dx, dy)
-        Déplace l'unité de dx, dy.
-    attack(target)
-        Attaque une unité cible.
-    draw(screen)
-        Dessine l'unité sur la grille.
-    """
-
-    def __init__(self, x, y, health, attack_power, team):
-        """
-        Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
-
-        Paramètres
-        ----------
-        x : int
-            La position x de l'unité sur la grille.
-        y : int
-            La position y de l'unité sur la grille.
-        health : int
-            La santé de l'unité.
-        attack_power : int
-            La puissance d'attaque de l'unité.
-        team : str
-            L'équipe de l'unité ('player' ou 'enemy').
-        """
+    def __init__(self, x, y, health, attack_power, team, niveau=1, a_clef=False):
+        
         self.x = x
         self.y = y
         self.health = health
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
+        self.niveau = niveau  # Niveau du joueur
+        self.a_clef = a_clef  # Possession d'une clé
         self.is_selected = False
 
     def move(self, dx, dy):
@@ -94,3 +53,14 @@ class Unit:
                              self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
                            2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+   
+    def augmenter_niveau(self):
+        self.niveau += 1
+        print(f"Votre niveau a augmenté : {self.niveau}")
+
+    def collect(self, obj):
+        if obj.name == "Clef":
+            self._unit.a_clef = True  # Le joueur a collecté la clé
+            self.has_object = obj  # Stocker l'objet dans has_object
+            print("Vous avez ramassé la clef!")
+

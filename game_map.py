@@ -16,7 +16,12 @@ def mur():
     # Créer les murs pour les différentes salles et zones
     wall_conditions = [
         # murs principaux
-        ((x == centre_x) & (y < 6), (x == centre_x) & (y > centre_y+6), (x < centre_x - 6) & (y == centre_y), (x > centre_x + 6) & (y == centre_y)),
+        ((x == centre_x) & (y < 6), (x == centre_x) & (y > centre_y+6), 
+         (x < centre_x - 6) & (y == centre_y), (x > centre_x + 6) & (y == centre_y),
+         (x == 0) & (y >= 2) & (y <= GRID_SIZE_V-2),
+         (x == GRID_SIZE_H-1) & (y >= 1) & (y <= GRID_SIZE_V),
+         (x >= 3) & (x <= GRID_SIZE_H-3) & (y == 0),
+         (x >= 3) & (x <= GRID_SIZE_H) & (y == GRID_SIZE_V-1)),
 
         # Salle 1 (coordonnées des murs)
         ((x == 3) & (y < 3), #bon
@@ -130,36 +135,84 @@ def teleport_unit(unit, target_pos):
 
 
       #  def passages_secrets ():
-class salle :
-        def __init__(self, id, couleur, piège=False, enemy=None, artefact=None):
-            """def __init__(self, id, couleur, piège=False, ennemis=None, artefact=None):
-        
-        Initialise une salle avec ses caractéristiques.
-        - id: identifiant de la salle (1, 2, 3, etc.)
-        - couleur: couleur de la salle.
-        - piège: booléen, s'il y a un piège dans la salle.
-        - ennemis: liste ou nombre d'ennemis dans la salle.
-        - artefact: description ou booléen pour savoir si un artefact est présent.
+
+class GameObject:
+    def __init__(self, x, y, name, color, effect_color):
         """
-            self.id = id
-            self.couleur = couleur
-            self.piège = piège
-            self.enemy = enemy if enemy is not None else []
-            self.artefact = artefact
+        Initialise un objet à une position spécifique.
+        - x, y: Position de l'objet en cellules.
+        - name: Nom de l'objet (ex: 'épée', 'potion').
+        - color: Couleur utilisée pour dessiner l'objet.
+        - effect_color: Couleur de l'effet (ex: vert pour le joueur)
+        """
+        self.x = x
+        self.y = y
+        self.name = name
+        self.color = color
+        self.effect_color = effect_color
+        
+    def draw(self, screen):
+        """Dessine l'objet sur l'écran."""
+        rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        pygame.draw.rect(screen, self.color, rect)
+    
+    def __repr__(self):
+        return f"GameObject({self.name}, {self.x}, {self.y})"
 
-        def afficher_infos(self):
-            """Affiche les informations sur la salle."""
-            print(f"Salle {self.id}:")
-            print(f"  Piège: {'Oui' if self.piège else 'Non'}")
-            print(f"  Ennemis: {self.enemy}")
-            print(f"  Artefact: {self.artefact if self.artefact else 'Aucun'}")
+def generate_objects():
+    """
+    Crée une liste d'objets du jeu.
+    """
+    objets = [
+        GameObject(4, 4, 'Clef', GREEN, WHITE),  # Exemple : une épée
+        #GameObject(2, 6, 'clé magique', YELLOW, BLACK),  # Exemple : une clé magique
+        #GameObject(8, 10, 'potion', LIGHT_YELLOW, BLACK)  # Exemple : une potion
+    ]
+    return objets
 
+class salle :
+    def __init__(self, id, couleur, piège=False, enemy=None, artefact=None, conditions=None):
+        """def __init__(self, id, couleur, piège=False, ennemis=None, artefact=None):
+    
+    Initialise une salle avec ses caractéristiques.
+    - id: identifiant de la salle (1, 2, 3, etc.)
+    - couleur: couleur de la salle.
+    - piège: booléen, s'il y a un piège dans la salle.
+    - ennemis: liste ou nombre d'ennemis dans la salle.
+    - artefact: description ou booléen pour savoir si un artefact est présent.
+    """
+        self.id = id
+        self.couleur = couleur
+        self.piège = piège
+        self.enemy = enemy if enemy is not None else []
+        self.artefact = artefact
+        self.conditions = conditions if conditions else {}  # Assurez un dictionnaire
+   
+    def afficher_infos(self):
+        print(f"Salle {self.id}:")
+        print(f"  Piège: {'Oui' if self.piège else 'Non'}")
+        print(f"  Ennemis: {self.enemy}")
+        print(f"  Artefact: {self.artefact if self.artefact else 'Aucun'}")
 
-cave = salle(1, KAKI, False, 3, None)
-sellier = salle(2, BROWN, False, 3, None)
-cuisines = salle(3, WHITE, False, 3, None)
-ecuries = salle(4, YELLOW, False, 3, None)
-arene = salle(5, RED, False, 3, None)
+    def verifier_conditions(self, unit):
+        for condition, valeur in self.conditions.items():
+            if condition == unit.a_clef:
+                print("Condition manquante : clef requise.")
+                return False
+            if condition == "niveau_min" and unit.niveau < valeur:
+                print(f"Condition manquante : niveau {valeur} requis.")
+                return False
+        print(f"Accès à la salle {self.id} autorisé.")
+        return True
+
+# Création d'un objet GameObject
+clef = GameObject(4, 4, 'Clef', GREEN, WHITE),
+
+cave = salle(1, KAKI, False, 3, artefact=clef)
+sellier = salle(2, BROWN, False, 3, conditions={"Clef": True})
+cuisines = salle(3, WHITE, False, 3)
+ecuries = salle(4, YELLOW, False, 3)
+arene = salle(5, RED, False, 3)
 
 salles = [cave, sellier, cuisines, ecuries, arene]
 

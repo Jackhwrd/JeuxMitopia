@@ -5,14 +5,15 @@ import numpy as np
 from unit import *
 from game_map import *
 
-walls = mur()
-rooms = generate_rooms(salles)
-
 class Game:
    
     def __init__(self, screen):
         
         self.screen = screen
+        self.walls = mur()
+        self.rooms = generate_rooms(salles)
+        self.objects = generate_objects()
+
         self.player_units = [Unit(0, 0, 10, 2, 'player'),
                              Unit(1, 0, 10, 2, 'player'),
                              Unit(2, 0, 10, 2, 'player')]
@@ -20,7 +21,7 @@ class Game:
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
                             Unit(7, 6, 8, 1, 'enemy'),
                             Unit(8, 6, 8, 1, 'enemy')]
-        
+         
         # Prépare les rectangles pour les cellules de la grille
         self.grid_rects = [
             pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -65,22 +66,52 @@ class Game:
                             dy = -1
                         elif event.key == pygame.K_DOWN:
                             dy = 1
+                        
+                        new_x = selected_unit.x + dx
+                        new_y = selected_unit.y + dy
 
-                        selected_unit.move(dx, dy)
-                        
-                        if any(
-                            pygame.Rect(
-                                selected_unit.x * CELL_SIZE,
-                                selected_unit.y * CELL_SIZE,
-                                CELL_SIZE,
-                                CELL_SIZE,
-                            ).colliderect(wall)
-                            for wall in walls
-                        ):  
-                                print("Collision détectée !")
-                                # Annuler le mouvement si nécessaire
-                                selected_unit.move(-dx, -dy)
-                        
+                        # Si la touche + est appuyée, essayer de ramasser un objet
+                        if event.key == pygame.K_KP_PLUS:  # Touche + du pavé numérique
+                            for obj in self.objects:
+                                if obj.x == selected_unit.x and obj.y == selected_unit.y:
+                                    print(f"Vous avez ramassé {obj.name} !")
+                                    obj.collected = True  # L'objet est ramassé
+                                    self.objects.remove(obj)  # Retirer de la carte
+                                    selected_unit.has_object = obj  # Associer l'objet à l'unité
+                                    print(f"L'objet dans has_object : {selected_unit.has_object.name}")  # Debug
+                                    break 
+
+                        # Vérifier les collisions avec les murs
+                        proposed_rect = pygame.Rect(
+                            new_x * CELL_SIZE,
+                            new_y * CELL_SIZE,
+                            CELL_SIZE,
+                            CELL_SIZE,
+                        )
+                        if any(proposed_rect.colliderect(wall) for wall in self.walls):
+                            print("Collision détectée ! Mouvement annulé.")
+                            # Collision détectée : ne pas appliquer le déplacement
+                            continue
+
+                        # Vérifier si le joueur tente d'entrer dans une salle
+                        room_id = (
+                            self.rooms[new_x, new_y]
+                            if (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V)
+                            else 0
+                        )
+                        salle = next((s for s in salles if s.id == room_id), None)
+
+                        # Si le joueur entre dans une salle, vérifier les conditions
+                        if salle:
+                            if salle.verifier_conditions(selected_unit):
+                                selected_unit.x, selected_unit.y = new_x, new_y
+                                print(f"Vous êtes entré dans la salle {salle.id}.")
+                            else:
+                                print(f"Accès refusé à la salle {salle.id}.")
+                        else:
+                            # Pas de salle : déplacer normalement
+                            selected_unit.x, selected_unit.y = new_x, new_y
+                            
                         self.flip_display()
                         # Attaque (touche espace) met fin au tour
                         if event.key == pygame.K_SPACE:
@@ -119,19 +150,23 @@ class Game:
                 grid_x, grid_y = x // CELL_SIZE, y // CELL_SIZE
             
                 # Obtenir la couleur de la cellule
-                color = get_cell_color(grid_x, grid_y, rooms, walls, salles)
+                color = get_cell_color(grid_x, grid_y, self.rooms, self.walls, salles)
                     
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
                 pygame.draw.rect(self.screen, color, rect)
                 
                 pygame.draw.rect(self.screen, BLACK, rect, 1)
 
+        # Affiche les objets
+        for obj in self.objects:
+            obj.draw(self.screen)
+
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
         
         # Affiche les murs
-        for wall in walls:
+        for wall in self.walls:
             pygame.draw.rect(self.screen, BLACK, wall)  # Dessiner les murs
               
         
