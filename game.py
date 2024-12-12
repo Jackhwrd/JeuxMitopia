@@ -6,7 +6,8 @@ from game_map import *
 from image import *
 from classes import *
 
-
+walls = mur()
+rooms = generate_rooms(salles)
 
 
 class Game:
@@ -36,11 +37,11 @@ class Game:
         self.player_units = []
         for i, player_class in enumerate(player_classe):
             if player_class == "Mage":
-                    self.player_units.append(Mage_player(1, i, 10, 3, image_croque_minou, 2, 5))
+                    self.player_units.append(Mage_player(0, i, 10, 3, image_croque_minou, 2, 5))
             elif player_class == "Vampire":
-                    self.player_units.append(Vampire_player(1, i, 8, 4, image_croque_minou, 3, 6))
+                    self.player_units.append(Vampire_player(0, i, 8, 4, image_croque_minou, 3, 6))
             elif player_class == "Guerrier":
-                    self.player_units.append(Guerrier_player(1, i, 12, 2, image_croque_minou, 4, 4))
+                    self.player_units.append(Guerrier_player(0, i, 12, 2, image_croque_minou, 4, 4))
 
 
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire",0,0),
@@ -68,108 +69,107 @@ class Game:
     def handle_player_turn(self):
         """Tour du joueur"""
         for selected_unit in self.player_units:
-            if selected_unit.en_vie == True :  # le joueur joue son tour si il est en vie 
-                # Tant que l'unité n'a pas terminé son tour
-                has_acted = False
-                selected_unit.is_selected = True
-                self.flip_display()
-                while not has_acted:
 
-                    # Important: cette boucle permet de gérer les événements Pygame
-                    for event in pygame.event.get():
+            # Tant que l'unité n'a pas terminé son tour
+            has_acted = False
+            selected_unit.is_selected = True
+            self.flip_display()
+            while not has_acted:
 
-                        # Gestion de la fermeture de la fenêtre
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            exit()
+                # Important: cette boucle permet de gérer les événements Pygame
+                for event in pygame.event.get():
 
-                        # Gestion des touches du clavier
-                        if event.type == pygame.KEYDOWN:
+                    # Gestion de la fermeture de la fenêtre
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
 
-                            # Déplacement (touches fléchées)
-                            dx, dy = 0, 0
-                            if event.key == pygame.K_LEFT:
-                                dx = -1
-                            elif event.key == pygame.K_RIGHT:
-                                dx = 1
-                                # Téléportation si en haut à droite
-                                if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
-                                    teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
-                                    self.flip_display()
-                                    has_acted = True
-                                    continue
-                            elif event.key == pygame.K_UP:
-                                dy = -1
-                            elif event.key == pygame.K_DOWN:
-                                dy = 1
-                            
-                            new_x = selected_unit.x + dx
-                            new_y = selected_unit.y + dy
+                    # Gestion des touches du clavier
+                    if event.type == pygame.KEYDOWN:
 
-                            # Si la touche + est appuyée, essayer de ramasser un objet
-                            if event.key == pygame.K_KP_PLUS:  # Touche + du pavé numérique
-                                for obj in self.objects:
-                                    if obj.x == selected_unit.x and obj.y == selected_unit.y:
-                                        print(f"Vous avez ramassé {obj.name} !")
-                                        obj.collected = True  # L'objet est ramassé
-                                        self.objects.remove(obj)  # Retirer de la carte
-                                        
-                                        # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
-                                        if not hasattr(selected_unit, 'has_object'):
-                                            selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
-
-                                        selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
-                                        print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
-                                        break 
-
-                            # Vérifier les collisions avec les murs
-                            proposed_rect = pygame.Rect(
-                                new_x * CELL_SIZE,
-                                new_y * CELL_SIZE,
-                                CELL_SIZE,
-                                CELL_SIZE,
-                            )
-                            if any(proposed_rect.colliderect(wall) for wall in self.walls):
-                                print("Collision détectée ! Mouvement annulé.")
-                                # Collision détectée : ne pas appliquer le déplacement
-                                continue
-
-                            # Vérifier si le joueur tente d'entrer dans une salle
-                            room_id = (
-                                self.rooms[new_x, new_y]
-                                if (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V)
-                                else 0
-                            )
-                            salle = next((s for s in salles if s.id == room_id), None)
-
-                            # Si le joueur entre dans une salle, vérifier les conditions
-                            if salle:
-                                if salle.verifier_conditions(selected_unit):
-                                    selected_unit.x, selected_unit.y = new_x, new_y
-                                    print(f"Vous êtes entré dans la salle {salle.id}.")
-                                else:
-                                    print(f"Accès refusé à la salle {salle.id}.")
-                            else:
-                                # Pas de salle : déplacer normalement
-                                selected_unit.x, selected_unit.y = new_x, new_y
-                                
-                            self.flip_display()
-                            # Attaque (touche espace) met fin au tour
-                            if event.key == pygame.K_SPACE:
-                                for enemy in self.enemy_units:
-                                    if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
-                                        selected_unit.attack(enemy)
-                                        if enemy.health <= 0:
-                                            self.enemy_units.remove(enemy)
-
+                        # Déplacement (touches fléchées)
+                        dx, dy = 0, 0
+                        if event.key == pygame.K_LEFT:
+                            dx = -1
+                        elif event.key == pygame.K_RIGHT:
+                            dx = 1
+                            # Téléportation si en haut à droite
+                            if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
+                                teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
+                                self.flip_display()
                                 has_acted = True
-                                selected_unit.is_selected = False
-            else : 
-                pass 
-        
-        self.game_over()
+                                continue
+                        elif event.key == pygame.K_UP:
+                            dy = -1
+                        elif event.key == pygame.K_DOWN:
+                            dy = 1
+                        
+                        new_x = selected_unit.x + dx
+                        new_y = selected_unit.y + dy
+
+                        # Si la touche + est appuyée, essayer de ramasser un objet
+                        if event.key == pygame.K_KP_PLUS:  # Touche + du pavé numérique
+                            for obj in self.objects:
+                                if obj.x == selected_unit.x and obj.y == selected_unit.y:
+                                    print(f"Vous avez ramassé {obj.name} !")
+                                    obj.collected = True  # L'objet est ramassé
+                                    self.objects.remove(obj)  # Retirer de la carte
+                                    
+                                    # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
+                                    if not hasattr(selected_unit, 'has_object'):
+                                        selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
+
+                                    selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
+                                    print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
+                                    break 
+
+                        # Vérifier les collisions avec les murs
+                        proposed_rect = pygame.Rect(
+                            new_x * CELL_SIZE,
+                            new_y * CELL_SIZE,
+                            CELL_SIZE,
+                            CELL_SIZE,
+                        )
+                        if any(proposed_rect.colliderect(wall) for wall in self.walls):
+                            print("Collision détectée ! Mouvement annulé.")
+                            # Collision détectée : ne pas appliquer le déplacement
+                            continue
+
+                        # Vérifier si le joueur tente d'entrer dans une salle
+                        room_id = (
+                            self.rooms[new_x, new_y]
+                            if (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V)
+                            else 0
+                        )
+                        salle = next((s for s in salles if s.id == room_id), None)
+
+                        # Si le joueur entre dans une salle, vérifier les conditions
+                        if salle:
+                            if salle.verifier_conditions(selected_unit):
+                                selected_unit.x, selected_unit.y = new_x, new_y
+                                print(f"Vous êtes entré dans la salle {salle.id}.")
+                            else:
+                                print(f"Accès refusé à la salle {salle.id}.")
+                        else:
+                            # Pas de salle : déplacer normalement
+                            selected_unit.x, selected_unit.y = new_x, new_y
+                            
+                        self.flip_display()
+                        # Attaque (touche espace) met fin au tour
+                        if event.key == pygame.K_SPACE:
+                            for enemy in self.enemy_units:
+                                if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
+                                    selected_unit.attack(enemy)
+                                    if enemy.health <= 0:
+                                        self.enemy_units.remove(enemy)
+
+                            has_acted = True
+                            selected_unit.is_selected = False
+
+    
 
 
+    
     def move_unit_multiple(self, unit):
         """Permet au joueur de déplacer l'unité vers une position cible."""
         target_x, target_y = unit.x, unit.y  # Position actuelle
@@ -205,11 +205,10 @@ class Game:
                     if event.key == pygame.K_RETURN:
                         unit.x, unit.y = target_x, target_y
                         return
-        
 
     def is_wall(self, x, y):
         """Vérifie si une case donnée contient un mur."""
-        for wall in self.walls:
+        for wall in walls:
             if wall.collidepoint(x * CELL_SIZE, y * CELL_SIZE):
                 return True
         return False
@@ -244,7 +243,7 @@ class Game:
                 grid_x, grid_y = x // CELL_SIZE, y // CELL_SIZE
                 
                 # Obtenir la couleur de la cellule
-                color = get_cell_color(grid_x, grid_y, self.rooms, self.walls, salles)
+                color = get_cell_color(grid_x, grid_y, rooms, walls, salles)
                     
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
                 pygame.draw.rect(self.screen, color, rect)
@@ -258,7 +257,6 @@ class Game:
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
-            #unit.update_health_bar(self.screen)
 
         # Affiche les objets
         for obj in self.objects:
@@ -271,30 +269,12 @@ class Game:
         # Rafraîchissement de l'écran
         pygame.display.flip()
 
-    def game_over(self) :
-        """ permet de voir si tout les joueurs son mort"""
-        som = 0
-        for player in self.player_units :  
-            if player.en_vie == False : 
-                som += 3
-
-        if som == 3 : 
-            #tout les joueurs sont mort : 
-            #declanchement de la scene du game over et retours au menue principal. 
-            pass
-        
-
+    def game_over() :
+        pass 
         
     def victoire() : 
         pass
 
-    def spawn_monster(self, monster_class_name):
-        monster = Mummy(self)
-        self.all_monsters.add(monster_class_name.__call__(self))
-
-
-
-    
 
 def main():
 

@@ -33,7 +33,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, attack_power, team,image,defe,vit,niveau = 1):
+    def __init__(self, x, y, health, attack_power, team,image,defe,vit,niveau = 1):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -52,7 +52,7 @@ class Unit:
         """
         self.x = x
         self.y = y
-        self.health = 100
+        self.health = health
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
@@ -61,8 +61,6 @@ class Unit:
         self.vitess = vit
         self.has_object = []
         self.niveau = niveau  # Niveau du joueur
-        self.max_health = 100
-        self.en_vie = True  
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -109,7 +107,7 @@ class Unit:
             self.health -= degat 
         else:
             #si le joueur n'a plus de point de vie il doit mourir 
-            self.en_vie = False 
+            self.en_vie = False
 
     def update_health_bar(self,surface):
         # Couleur de la barre d'arrière-plan (gris)

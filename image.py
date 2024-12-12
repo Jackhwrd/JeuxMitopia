@@ -11,6 +11,7 @@ image_mechant_vampire = pygame.image.load("image/mechant_vampire.png")
 image_mechant_mage = pygame.image.load("image/mechant_mage.png")
 
 
+
 # Constantes
 GRID_SIZE_V = 24
 GRID_SIZE_H = 40

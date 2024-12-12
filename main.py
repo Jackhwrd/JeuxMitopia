@@ -313,3 +313,9 @@ while running:
                         
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"
+
+
+
+
+
+ 
