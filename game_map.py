@@ -211,6 +211,7 @@ class salle :
         self.enemy = enemy if enemy is not None else []
         self.objet = objet
         self.conditions = conditions if conditions else {}  # Assurez un dictionnaire
+        self.ouverte = False # fermée par défaut
    
     def afficher_infos(self):
         print(f"Salle {self.id}:")
@@ -218,8 +219,13 @@ class salle :
         print(f"  Ennemis: {self.enemy}")
         print(f"  Objet: {self.objet if self.objet else 'Aucun'}")
         print(f"  Conditions : {self.conditions}")
+        print(f"  Ouverte : {'Oui' if self.ouverte else 'Non'}")
 
     def verifier_conditions(self, unit):
+        if self.ouverte:
+            print(f"Accès libre à la salle {self.id}.")
+            return True  # La salle est déjà ouverte
+        
         for condition, valeur in self.conditions.items():
             if condition == "Clef" and not any(obj.name == "Clef" for obj in unit.has_object):
                 print("Condition manquante : clef requise.")
@@ -235,6 +241,7 @@ class salle :
                 print(f"Condition manquante : niveau {valeur} requis.")
                 return False
         print(f"Accès à la salle {self.id} autorisé.")
+        self.ouverte = True
         return True
 
 # Création d'un objet GameObject

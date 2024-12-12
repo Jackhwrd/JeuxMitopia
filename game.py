@@ -150,6 +150,14 @@ class Game:
                         )
                         salle = next((s for s in salles if s.id == room_id), None)
 
+                        # Si la salle est ouverte
+                        if salle:
+                            if salle.verifier_conditions(selected_unit):
+                                selected_unit.x, selected_unit.y = new_x, new_y
+                                print(f"Vous êtes entré dans la salle {salle.id}.")
+                            else:
+                                print(f"Accès refusé à la salle {salle.id}.")
+
                         # Si le joueur entre dans une salle, vérifier les conditions
                         if salle:
                             if salle.verifier_conditions(selected_unit):
