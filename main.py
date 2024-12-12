@@ -9,11 +9,11 @@ pygame.font.init()
 
 # Création de la fenêtre
 pygame.display.set_caption("Menu interactif")
-screen = pygame.display.set_mode((1080, 720))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # Chargement de l'arrière-plan
 
-arriere_plan = pygame.transform.scale(arriere_plan, (1080, 720))
+arriere_plan = pygame.transform.scale(arriere_plan, (WIDTH, HEIGHT))
 
 
 # Options du menu
@@ -81,7 +81,7 @@ while running:
         for i, option in enumerate(options):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
-            text_rect = texte.get_rect(center=(540, 300 + i * 90))  # Espacement vertical entre les options
+            text_rect = texte.get_rect(center=(WIDTH//2, 300 + i * 90))  # Espacement vertical entre les options
             screen.blit(texte, text_rect.topleft)
 
     elif scene_courant == "selection_perso":
@@ -89,7 +89,7 @@ while running:
         for i, option in enumerate(options_perso):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
-            text_rect = texte.get_rect(center=(540, 300 + i * 90))  # Espacement vertical entre les options
+            text_rect = texte.get_rect(center=(WIDTH//2, 300 + i * 90))  # Espacement vertical entre les options
             screen.blit(texte, text_rect.topleft)
 
     elif scene_courant == "Menu son":
@@ -97,14 +97,14 @@ while running:
         for i, option in enumerate(options_son):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
-            text_rect = texte.get_rect(center=(540, 300 + i * 90))  # Espacement vertical entre les options
+            text_rect = texte.get_rect(center=(WIDTH//2, 300 + i * 90))  # Espacement vertical entre les options
             screen.blit(texte, text_rect.topleft)
 
     elif scene_courant == "Credit":
         #affiché les crédits : 
         y_offset = 210  # Position de départ pour les crédits
         for line in credit_text:
-            text_rect = texte.get_rect(center=(540, y_offset))  
+            text_rect = texte.get_rect(center=(WIDTH//2, y_offset))  
             screen.blit(texte, text_rect.topleft)
             y_offset += 50  
 
@@ -112,17 +112,17 @@ while running:
         for i, option in enumerate(options_credit):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
-            text_rect = texte.get_rect(center=(540, 600 ))  # Espacement vertical entre les options
+            text_rect = texte.get_rect(center=(WIDTH//2, 600 ))  # Espacement vertical entre les options
             screen.blit(texte, text_rect.topleft)
 
     elif scene_courant == "selection_perso1":
         texte = font.render("Joueur 1 choisie ton perso", True, BLANC)
-        text_rect = texte.get_rect(center=(540, 210 ))
+        text_rect = texte.get_rect(center=(WIDTH//2, 210 ))
         screen.blit(texte, text_rect.topleft)
         for i, option in enumerate(list_joueur):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
-            text_rect = texte.get_rect(center=(540, 300 + i * 110))  # Espacement vertical entre les options
+            text_rect = texte.get_rect(center=(WIDTH//2, 300 + i * 110))  # Espacement vertical entre les options
             screen.blit(texte, text_rect.topleft)
 
             image = list_image[i]
@@ -131,12 +131,12 @@ while running:
 
     elif scene_courant == "selection_perso2":
         texte = font.render("Joueur 2 choisie ton perso", True, BLANC)
-        text_rect = texte.get_rect(center=(540, 210 ))
+        text_rect = texte.get_rect(center=(WIDTH//2, 210 ))
         screen.blit(texte, text_rect.topleft)
         for i, option in enumerate(list_joueur):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
-            text_rect = texte.get_rect(center=(540, 300 + i * 110))  # Espacement vertical entre les options
+            text_rect = texte.get_rect(center=(WIDTH//2, 300 + i * 110))  # Espacement vertical entre les options
             screen.blit(texte, text_rect.topleft)
 
             image = list_image[i]
@@ -145,12 +145,12 @@ while running:
         
     elif scene_courant == "selection_perso3":
         texte = font.render("Joueur 3 choisie ton perso", True, BLANC)
-        text_rect = texte.get_rect(center=(540, 210 ))
+        text_rect = texte.get_rect(center=(WIDTH//2, 210 ))
         screen.blit(texte, text_rect.topleft)
         for i, option in enumerate(list_joueur):
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
-            text_rect = texte.get_rect(center=(540, 300 + i * 110))  # Espacement vertical entre les options
+            text_rect = texte.get_rect(center=(WIDTH//2, 300 + i * 110))  # Espacement vertical entre les options
             screen.blit(texte, text_rect.topleft)
 
             image = list_image[i]
