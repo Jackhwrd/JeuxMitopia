@@ -73,12 +73,14 @@ class Game:
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
             selected_unit.is_selected = True
+            selecting_attack = False  # Flag pour savoir si on est dans le menu d'attaque
+            current_option = 0  # Option actuelle
+            selected_attack = 0  # Attaque actuellement sélectionnée
             self.flip_display()
+            
             while not has_acted:
-
-                # Important: cette boucle permet de gérer les événements Pygame
+                # Boucle principale d'événements
                 for event in pygame.event.get():
-
                     # Gestion de la fermeture de la fenêtre
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -86,87 +88,67 @@ class Game:
 
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
-
-                        # Déplacement (touches fléchées)
-                        dx, dy = 0, 0
-                        if event.key == pygame.K_LEFT:
-                            dx = -1
-                        elif event.key == pygame.K_RIGHT:
-                            dx = 1
-                            # Téléportation si en haut à droite
-                            if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
-                                teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
-                                self.flip_display()
-                                has_acted = True
-                                continue
-                        elif event.key == pygame.K_UP:
-                            dy = -1
-                        elif event.key == pygame.K_DOWN:
-                            dy = 1
-                        
-                        new_x = selected_unit.x + dx
-                        new_y = selected_unit.y + dy
-
-                        # Si la touche + est appuyée, essayer de ramasser un objet
-                        if event.key == pygame.K_KP_PLUS:  # Touche + du pavé numérique
-                            for obj in self.objects:
-                                if obj.x == selected_unit.x and obj.y == selected_unit.y:
-                                    print(f"Vous avez ramassé {obj.name} !")
-                                    obj.collected = True  # L'objet est ramassé
-                                    self.objects.remove(obj)  # Retirer de la carte
-                                    
-                                    # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
-                                    if not hasattr(selected_unit, 'has_object'):
-                                        selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
-
-                                    selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
-                                    print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
-                                    break 
-
-                        # Vérifier les collisions avec les murs
-                        proposed_rect = pygame.Rect(
-                            new_x * CELL_SIZE,
-                            new_y * CELL_SIZE,
-                            CELL_SIZE,
-                            CELL_SIZE,
-                        )
-                        if any(proposed_rect.colliderect(wall) for wall in self.walls):
-                            print("Collision détectée ! Mouvement annulé.")
-                            # Collision détectée : ne pas appliquer le déplacement
-                            continue
-
-                        # Vérifier si le joueur tente d'entrer dans une salle
-                        room_id = (
-                            self.rooms[new_x, new_y]
-                            if (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V)
-                            else 0
-                        )
-                        salle = next((s for s in salles if s.id == room_id), None)
-
-                        # Si le joueur entre dans une salle, vérifier les conditions
-                        if salle:
-                            if salle.verifier_conditions(selected_unit):
-                                selected_unit.x, selected_unit.y = new_x, new_y
-                                print(f"Vous êtes entré dans la salle {salle.id}.")
-                            else:
-                                print(f"Accès refusé à la salle {salle.id}.")
-                        else:
-                            # Pas de salle : déplacer normalement
-                            selected_unit.x, selected_unit.y = new_x, new_y
+                        # Si on n'est pas dans le menu d'attaque, afficher les options principales
+                        if not selecting_attack:
+                            # Déplacement du curseur entre "Avancer" et "Attaquer"
+                            if event.key == pygame.K_DOWN:
+                                current_option = (current_option + 1) % 2
+                            elif event.key == pygame.K_UP:
+                                current_option = (current_option - 1) % 2
                             
-                        self.flip_display()
-                        # Attaque (touche espace) met fin au tour
-                        if event.key == pygame.K_SPACE:
-                            for enemy in self.enemy_units:
-                                if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
-                                    selected_unit.attack(enemy)
-                                    if enemy.health <= 0:
-                                        self.enemy_units.remove(enemy)
+                            # Si l'option "Attaquer" est sélectionnée
+                            if event.key == pygame.K_RETURN and current_option == 1:
+                                selecting_attack = True  # On passe dans le menu d'attaque
+                                self.flip_display(attacking=False, Attack=None)
 
-                            has_acted = True
-                            selected_unit.is_selected = False
+                            # Si l'option "Avancer" est sélectionnée, on déplace l'unité
+                            if event.key == pygame.K_RETURN and current_option == 0:
+                                self.move_unit_multiple(selected_unit)
+                                self.flip_display(attacking=False, Attack=None)
+                                has_acted = True 
+                            
+                        # Si on est dans le menu d'attaque
+                        else:
+                            # Sélection des attaques
+                            if event.key == pygame.K_DOWN:
+                                selected_attack = (selected_attack + 1) % len(selected_unit.liste_attaque)
+                            elif event.key == pygame.K_UP:
+                                selected_attack = (selected_attack - 1) % len(selected_unit.liste_attaque)
 
-    
+                            # Si l'attaque est confirmée
+                            if event.key == pygame.K_RETURN:
+                                attack = selected_unit.liste_attaque[selected_attack]
+                                # Logique pour l'attaque ici
+                                for enemy in self.enemy_units:
+                                    if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
+                                        selected_unit.attack(enemy)  # Appliquer l'attaque
+                                        if enemy.health <= 0:
+                                            self.enemy_units.remove(enemy)
+
+                                has_acted = True
+                                selected_unit.is_selected = False
+
+                # Affichage des options principales (Avancer ou Attaquer)
+                if not selecting_attack:
+                    options = ["Avancer", "Attaquer"]
+                    for i, option in enumerate(options):
+                        color = BLUE if i == current_option else WHITE
+                        texte = font.render(option, True, color)
+                        text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                        self.screen.blit(texte, text_rect)
+                
+                # Affichage des attaques si l'option "Attaquer" est choisie
+                else:
+                    for i, attack in enumerate(selected_unit.liste_attaque):
+                        color = BLUE if i == selected_attack else WHITE
+                        texte = font.render(attack, True, color)
+                        text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                        self.screen.blit(texte, text_rect)
+
+                # Mise à jour de l'affichage
+                pygame.display.flip()
+
+        
 
 
     
