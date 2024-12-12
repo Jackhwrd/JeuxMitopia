@@ -114,8 +114,8 @@ class Game:
                             print("Vous ne pouvez pas sortir des limites de la carte !")
                             continue
 
-                        # Si la touche + est appuyée, essayer de ramasser un objet
-                        if event.key == pygame.K_KP_PLUS:  # Touche + du pavé numérique
+                        # Si la touche entrer est appuyée, essayer de ramasser un objet
+                        if event.key == pygame.K_RETURN:  # Touche entrer du pavé numérique
                             for obj in self.objects:
                                 if obj.x == selected_unit.x and obj.y == selected_unit.y:
                                     print(f"Vous avez ramassé {obj.name} !")
