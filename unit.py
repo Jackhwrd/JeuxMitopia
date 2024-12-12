@@ -33,7 +33,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power, team,image,defe,vit,niveau = 1):
+    def __init__(self, x, y, attack_power, team,image,defe,vit,niveau = 1):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -52,7 +52,7 @@ class Unit:
         """
         self.x = x
         self.y = y
-        self.health = health
+        self.health = 100
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
@@ -61,6 +61,9 @@ class Unit:
         self.vitess = vit
         self.has_object = []
         self.niveau = niveau  # Niveau du joueur
+        self.max_health = 100
+        self.en_vie = True 
+        
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -109,19 +112,19 @@ class Unit:
             #si le joueur n'a plus de point de vie il doit mourir 
             self.en_vie = False
 
-    def update_health_bar(self,surface):
-        # Couleur de la barre d'arrière-plan (gris)
-        background_color = (60, 63, 60)
-        # Couleur de la barre de vie (vert)
-        health_color = (111, 210, 46)
+    def update_health_bar(self, surface):
         
-        # Position et dimensions
-        bar_x = self.x +20
-        bar_y = self.y +50
-        bar_width = self.max_health
-        bar_height = 5
+        # Position et dimensions pour que ce soit juste en dessous du perso
+        bar_x = self.x * CELL_SIZE + 5  
+        bar_y = self.y * CELL_SIZE + CELL_SIZE 
+        
+        # Largeur de la barre de vie 
+        bar_width = CELL_SIZE  
+        bar_height = 5  
         
         # Dessiner la barre d'arrière-plan
         pygame.draw.rect(surface, background_color, [bar_x, bar_y, bar_width, bar_height])
+        
         # Dessiner la barre de vie (proportionnelle à la santé restante)
-        pygame.draw.rect(surface, health_color, [bar_x, bar_y, self.health, bar_height])
+        health_width = (self.health / self.max_health) * bar_width
+        pygame.draw.rect(surface, health_color, [bar_x, bar_y, health_width, bar_height])

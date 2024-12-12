@@ -51,6 +51,8 @@ KAKI = (140, 130, 80)
 MAGE = (182,37,207)
 GUERRIER = (138,148,163)
 VAMPIRE = (161,0,0)
+background_color = (60, 63, 60)
+health_color = (111, 210, 46)
 
 # Initialisation de la police
 font = pygame.font.Font("acadian_runes/police.ttf", 80)  
