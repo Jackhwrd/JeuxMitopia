@@ -79,6 +79,7 @@ while running:
         player_classe = []
         # Afficher les options principales
         for i, option in enumerate(options):
+            
             color = ROUGE if i == selected_option else BLANC  # Rouge si sélectionné, blanc sinon
             texte = font.render(option, True, color)
             text_rect = texte.get_rect(center=(540, 300 + i * 90))  # Espacement vertical entre les options
@@ -309,5 +310,6 @@ while running:
                         while True:
                             game.handle_player_turn()
                             game.handle_enemy_turn()
+                        
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"
