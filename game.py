@@ -97,8 +97,8 @@ class Game:
                             if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
                                 target_pos = (0, GRID_SIZE_V - 1)  # Par exemple, coordonnées de téléportation
                                 teleport_unit(selected_unit, target_pos, self.rooms, self.salles)
-                                self.flip_display()
-                                has_acted = True
+                                #self.flip_display()
+                                #has_acted = True
                                 continue
                         elif event.key == pygame.K_UP:
                             dy = -1
