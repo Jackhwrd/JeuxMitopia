@@ -16,10 +16,10 @@ def mur():
 
     # Créer les murs pour les différentes salles et zones
     wall_conditions = [
-        # murs principaux
+        # murs des contours
         ((x == centre_x) & (y < 6), (x == centre_x) & (y > centre_y+6), 
          (x < centre_x - 6) & (y == centre_y), (x > centre_x + 6) & (y == centre_y),
-         (x == 0) & (y >= 2) & (y <= GRID_SIZE_V-2),
+         (x == 0) & (y >= 3) & (y <= GRID_SIZE_V-2),
          (x == GRID_SIZE_H-1) & (y >= 1) & (y <= GRID_SIZE_V),
          (x >= 3) & (x <= GRID_SIZE_H-3) & (y == 0),
          (x >= 3) & (x <= GRID_SIZE_H) & (y == GRID_SIZE_V-1)),
@@ -119,16 +119,39 @@ def get_cell_color(grid_x, grid_y, rooms, walls, salles):
     # Sinon, retourne la couleur de la salle
     return salle.couleur  
 
-def teleport_unit(unit, target_pos):
+def teleport_unit(unit, target_pos, rooms, salles):
     """
-    Téléporte une unité à une position cible.
-
+    Téléporte une unité à une position cible et vérifie les conditions d'entrée.
+    
     Args:
         unit (Unit): L'unité à téléporter.
         target_pos (tuple): Position cible (x, y) en cellules.
+        rooms (np.ndarray): Tableau NumPy représentant les salles.
+        salles (list): Liste des salles avec leurs conditions.
     """
-    unit.x, unit.y = target_pos
-    print(f"L'unité {unit} a été téléportée à {target_pos} !")
+    target_x, target_y = target_pos
+    
+    # Vérifier si les coordonnées sont valides dans la grille
+    if not (0 <= target_x <= GRID_SIZE_H and 0 <= target_y <= GRID_SIZE_V):
+        print("Position de téléportation invalide !")
+        return
+    
+    # Identifier l'ID de la salle à la position cible
+    room_id = rooms[target_x, target_y]
+    salle = next((s for s in salles if s.id == room_id), None)
+    
+    if salle:
+        # Vérifier les conditions d'entrée
+        if salle.verifier_conditions(unit):
+            # Téléporter l'unité
+            unit.x, unit.y = target_pos
+            print(f"L'unité {unit} a été téléportée à {target_pos}, dans la salle {salle.id}.")
+        else:
+            print(f"Accès refusé à la salle {salle.id}. Conditions non remplies.")
+    else:
+        # Si aucune salle n'est associée à la position, téléporter normalement
+        unit.x, unit.y = target_pos
+        print(f"L'unité {unit} a été téléportée à {target_pos}, hors d'une salle définie.")
 
 
        # def piège ():  --> augmenter les probas d'avoir un piège au fur et à mesure des niveaux

@@ -35,6 +35,7 @@ class Game:
         self.player_class = player_classe # liste des classes des joueurs 
 
         self.walls = mur()
+        self.salles = salles
         self.rooms = generate_rooms(salles)
         self.objects = generate_objects()
 
@@ -94,7 +95,8 @@ class Game:
                             dx = 1
                             # Téléportation si en haut à droite
                             if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
-                                teleport_unit(selected_unit, (0, GRID_SIZE_V - 1))
+                                target_pos = (0, GRID_SIZE_V - 1)  # Par exemple, coordonnées de téléportation
+                                teleport_unit(selected_unit, target_pos, self.rooms, self.salles)
                                 self.flip_display()
                                 has_acted = True
                                 continue
@@ -287,7 +289,7 @@ def main():
 
     # Instanciation de la fenêtre
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Mon jeu de stratégie")
+    pygame.display.set_caption("Test du jeu de stratégie")
 
     # Instanciation du jeu
     Perso = ["Mage","Guerrier","Vampire"]
