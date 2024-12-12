@@ -91,6 +91,9 @@ class Game:
                         dx, dy = 0, 0
                         if event.key == pygame.K_LEFT:
                             dx = -1
+                            if selected_unit.x == 0 and selected_unit.y == GRID_SIZE_V - 1:
+                                target_pos = (GRID_SIZE_H - 1, 0)  # Par exemple, coordonnées de téléportation
+                                teleport_unit(selected_unit, target_pos, self.rooms, self.salles)
                         elif event.key == pygame.K_RIGHT:
                             dx = 1
                             # Téléportation si en haut à droite
