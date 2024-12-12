@@ -37,11 +37,11 @@ class Game:
         self.player_units = []
         for i, player_class in enumerate(player_classe):
             if player_class == "Mage":
-                    self.player_units.append(Mage_player(0, i, 10, 3, image_croque_minou, 2, 5))
+                    self.player_units.append(Mage_player(i,0, 10, 3, image_croque_minou, 2, 5))
             elif player_class == "Vampire":
-                    self.player_units.append(Vampire_player(0, i, 8, 4, image_croque_minou, 3, 6))
+                    self.player_units.append(Vampire_player(i,0, 8, 4, image_croque_minou, 3, 6))
             elif player_class == "Guerrier":
-                    self.player_units.append(Guerrier_player(0, i, 12, 2, image_croque_minou, 4, 4))
+                    self.player_units.append(Guerrier_player(i,0, 12, 2, image_croque_minou, 4, 4))
 
 
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire",0,0),
@@ -194,6 +194,13 @@ class Game:
             if wall.collidepoint(x * CELL_SIZE, y * CELL_SIZE):
                 return True
         return False
+    
+    def is_occupied_by_unit(self, x, y):
+        """Vérifie si une case est occupée par une unité."""
+        for unit in self.player_units + self.enemy_units:
+            if unit.x == x and unit.y == y:
+                return True
+        return False
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -212,6 +219,44 @@ class Game:
                 enemy.attack(target)
                 if target.health <= 0:
                     self.player_units.remove(target)
+
+
+    def move_unit_multiple(self, unit):
+        """Permet au joueur de déplacer l'unité vers une position cible."""
+        target_x, target_y = unit.x, unit.y  # Position actuelle
+        while True:
+            # Afficher la grille avec la position cible surlignée
+            self.flip_display(attacking=False, Attack=None)
+            highlight_rect = pygame.Rect(target_x * CELL_SIZE, target_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(self.screen, YELLOW, highlight_rect, 3)  # Surligne la position cible
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.KEYDOWN:
+                    dx, dy = 0, 0
+                    if event.key == pygame.K_LEFT:
+                        dx = -1
+                    elif event.key == pygame.K_RIGHT:
+                        dx = 1
+                    elif event.key == pygame.K_UP:
+                        dy = -1
+                    elif event.key == pygame.K_DOWN:
+                        dy = 1
+
+                    # Mettre à jour la position cible
+                    new_x, new_y = target_x + dx, target_y + dy
+
+                    # Vérification si la nouvelle position est valide (pas un mur et pas occupée par une autre unité)
+                    if 0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V and not self.is_wall(new_x, new_y) and not self.is_occupied_by_unit(new_x, new_y):
+                        target_x, target_y = new_x, new_y
+
+                    # Valider le déplacement
+                    if event.key == pygame.K_RETURN:
+                        unit.x, unit.y = target_x, target_y
+                        return
 
     def flip_display(self, attacking=False, Attack=None):
         """Affiche le jeu."""
