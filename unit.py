@@ -33,7 +33,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, attack_power, team,image,defe,vit,niveau = 1):
+    def __init__(self, x, y, attack_power, team,image,defe,attaque,vit,niveau = 1):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -53,16 +53,18 @@ class Unit:
         self.x = x
         self.y = y
         self.health = 100
-        self.attack_power = attack_power
+        self.puissance_attaque = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
         self.character_image = image
-        self.defense = defe
+        self.stat_defense = defe
+        self.stat_attaque = attaque
         self.vitess = vit
         self.has_object = []
         self.niveau = niveau  # Niveau du joueur
         self.max_health = 100
         self.en_vie = True 
+        
         
 
     def move(self, dx, dy):
@@ -105,7 +107,7 @@ class Unit:
             self.has_object.append(obj)
             print(f"Vous avez ramassé : {obj.name}!")
             
-    def health(self,degat) : 
+    def update_health(self,degat) : 
         if self.health - degat > degat : #Le joueur à assez de vie pour subir le degat
             self.health -= degat 
         else:

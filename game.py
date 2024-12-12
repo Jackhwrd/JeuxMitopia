@@ -37,21 +37,16 @@ class Game:
         self.player_units = []
         for i, player_class in enumerate(player_classe):
             if player_class == "Mage":
-                    self.player_units.append(Mage_player(i,0, 3, image_croque_minou, 2, 5))
+                    self.player_units.append(Mage_player(i,0))
             elif player_class == "Vampire":
-                    self.player_units.append(Vampire_player(i,0, 4, image_croque_minou, 3, 6))
+                    self.player_units.append(Vampire_player(i,0))
             elif player_class == "Guerrier":
-                    self.player_units.append(Guerrier_player(i,0, 2, image_croque_minou, 4, 4))
+                    self.player_units.append(Guerrier_player(i,0))
 
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire",0,0),
-                            Unit(7, 6, 8, 1, 'enemy',"Vampire",0,0),
-                            Unit(8, 6, 8, 1, 'enemy',"Vampire",0,0)]
-       
-
-        # Associer les images des ennemis
-        for unit, image in zip(self.enemy_units, self.enemy_images):
-            unit.character_image = image
+        self.enemy_units = [Vampire_enemy(6,6),
+                            Vampire_enemy(7,6),
+                            Vampire_enemy(8,6)]
 
         # Prépare les rectangles pour les cellules de la grille
         self.grid_rects = [
@@ -68,9 +63,9 @@ class Game:
         
     def handle_player_turn(self):
         """Tour du joueur"""
-        for selected_unit in self.player_units:
+        for rang_joueur, selected_unit in enumerate (self.player_units):
 
-            if selected_unit.en_vie== True : #le joueur joue seulement si il est encore en vie 
+                
 
                 # Tant que l'unité n'a pas terminé son tour
                 has_acted = False
@@ -80,7 +75,15 @@ class Game:
                 selected_attack = 0  # Attaque actuellement sélectionnée
                 self.flip_display()
                 
-                while not has_acted:
+                while not has_acted: # tant que le tour du joueur n'est pas fini
+                    #affichage du numéros de joueur qui doit jouer 
+
+                    phrase = f"Joueur {rang_joueur + 1 }, à toi de jouer !"
+                    texte = font_affi_joueur.render(phrase, True, WHITE)
+                    text_rect = texte.get_rect(center=(540, 20))  # Espacement vertical entre les options
+                    self.screen.blit(texte, text_rect.topleft)
+                    
+
                     # Boucle principale d'événements
                     for event in pygame.event.get():
                         # Gestion de la fermeture de la fenêtre
@@ -119,13 +122,14 @@ class Game:
 
                                 # Si l'attaque est confirmée
                                 if event.key == pygame.K_RETURN:
-                                    attack = selected_unit.liste_attaque[selected_attack]
-                                    # Logique pour l'attaque ici
-                                    for enemy in self.enemy_units:
-                                        if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
-                                            selected_unit.attack(enemy)  # Appliquer l'attaque
-                                            if enemy.health <= 0:
-                                                self.enemy_units.remove(enemy)
+                                    
+                                    if selected_attack == 0:  
+                                        
+                                        selected_unit.attaque(selected_unit.liste_attaque[0],self)
+                                    elif selected_attack == 1:  
+                                        selected_unit.attaque(selected_unit.liste_attaque[1],self)
+                                    elif selected_attack == 2 : 
+                                        selected_unit.attaque(selected_unit.liste_attaque[0],self)
 
                                     has_acted = True
                                     selected_unit.is_selected = False
@@ -149,8 +153,8 @@ class Game:
 
                     # Mise à jour de l'affichage
                     pygame.display.flip()
-            else : 
-                pass 
+
+         
 
         
 

@@ -51,14 +51,15 @@ list_joueur = ["Croque - Minou","Guts","Batorie","Menue principal"]
 nouvelle_largeur = 100 
 nouvelle_hauteur = 100  
 new_croque_minou = pygame.transform.scale(image_croque_minou, (nouvelle_largeur, nouvelle_hauteur))
-
+new_image_guts = pygame.transform.scale(image_guts, (nouvelle_largeur, nouvelle_hauteur))
+new_image_vampire = pygame.transform.scale(image_vampire, (nouvelle_largeur, nouvelle_hauteur))
 image_vide = pygame.Surface((1, 1), pygame.SRCALPHA)
 image_vide.fill((0, 0, 0, 0))  # Remplir avec une transparence complète (RGBA : alpha = 0)
 
 list_image = [
     new_croque_minou,
-    new_croque_minou,
-    new_croque_minou,
+    new_image_guts,
+    new_image_vampire,
     image_vide
 ]
 # Chargement de la musique
