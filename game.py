@@ -107,6 +107,9 @@ class Game:
                         
                         new_x = selected_unit.x + dx
                         new_y = selected_unit.y + dy
+                        if not (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V):
+                            print("Vous ne pouvez pas sortir des limites de la carte !")
+                            continue
 
                         # Si la touche + est appuyée, essayer de ramasser un objet
                         if event.key == pygame.K_KP_PLUS:  # Touche + du pavé numérique
