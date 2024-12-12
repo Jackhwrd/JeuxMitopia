@@ -5,7 +5,7 @@ from image import *
 
 class Unit:
 
-    def __init__(self, x, y, health, attack_power, team,image,defe,vit,niveau = 1):
+    def __init__(self, x, y, health, attack_power, team, image, defe, vit, niveau = 1):
         
         self.x = x
         self.y = y
@@ -30,10 +30,10 @@ class Unit:
         """Attaque une unité cible."""
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
             target.health -= self.attack_power
-
+    
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else BLACK
+        #color = BLUE if self.team == 'player' else BLACK
    
         # Affiche le cadre vert si l'unité est sélectionnée
         

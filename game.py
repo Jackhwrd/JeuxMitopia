@@ -64,12 +64,7 @@ class Game:
             for y in range(0, HEIGHT, CELL_SIZE)
         ]
 
-        self.screen = screen
-        self.walls = mur()
-        self.rooms = generate_rooms(salles)
-        self.objects = generate_objects()
-        
-        
+                
     def handle_player_turn(self):
         """Tour du joueur"""
         for selected_unit in self.player_units:
@@ -287,8 +282,8 @@ class Game:
 def main():
 
     # Initialisation de Pygame
-    pygame.init()
-    clock = pygame.time.Clock()
+    #pygame.init()
+    #clock = pygame.time.Clock()
 
     # Instanciation de la fenêtre
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -296,7 +291,7 @@ def main():
 
     # Instanciation du jeu
     Perso = ["Mage","Guerrier","Vampire"]
-    game = Game(screen,Perso)
+    game = Game(screen, None, Perso)
 
     # Boucle principale du jeu
     while True:
