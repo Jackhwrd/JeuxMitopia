@@ -296,16 +296,16 @@ while running:
                     if selected_option == 0:  
                         player_classe.append("Mage")
                         #instance de la classe main 
-                        game = Game(screen, 3, player_classe)
-                        game.En_jeu(player_classe)
+                        game = Game(screen,player_classe)
+                        game.En_jeu()
                     elif selected_option == 1:  
                         player_classe.append("Guerrier")
-                        game = Game(screen, 3, player_classe)
-                        game.En_jeu(player_classe)
+                        game = Game(screen, player_classe)
+                        game.En_jeu()
                     elif selected_option == 2:  
                         player_classe.append("Vampire")
-                        game = Game(screen, 3, player_classe)
-                        game.En_jeu(player_classe)
+                        game = Game(screen, player_classe)
+                        game.En_jeu()
                         scene_courant = "Menu principal"
                         
                     elif selected_option == 3 :

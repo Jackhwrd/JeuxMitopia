@@ -1,5 +1,6 @@
 import pygame
 import random
+from collections import deque
 
 from unit import *
 from game_map import *
@@ -26,7 +27,7 @@ class Game:
     """
     
 
-    def __init__(self, screen, player_count,player_classe):
+    def __init__(self, screen,player_classe):
         """
         Initialise le jeu avec les paramètres nécessaires.
         """
@@ -51,7 +52,32 @@ class Game:
         self.objects = generate_objects()
         
                             
+    def bfs_reachable(self, selected_unit):
+            visited = np.zeros((HEIGHT,WIDTH))
+            queue = deque([(selected_unit.x, selected_unit.y, 0)])  
+            visited[selected_unit.x, selected_unit.y] = True
+            reachable = []
+
+            directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # 4 directions
+    
+            while queue:
+                x, y, dist = queue.popleft()
         
+                if dist > selected_unit.vitesse:  
+                    continue
+
+                print(x,y,dist)
+
+                reachable.append((x, y))
+
+            # Explore toute les directions
+                for dx, dy in directions:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < WIDTH and 0 <= ny < HEIGHT and not visited[ny, nx] and not self.is_wall(nx,ny) and not self.is_occupied_by_unit(nx,ny):
+                        visited[ny, nx] = True
+                        queue.append((nx, ny, dist + 1))
+    
+            return reachable   
         
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -101,7 +127,7 @@ class Game:
                                 # Si l'option "Avancer" est sélectionnée, on déplace l'unité
                                 if event.key == pygame.K_RETURN and current_option == 0:
                                     self.move_unit_multiple(selected_unit)
-                                    self.flip_display(attacking=False, Attack=None)
+                                    self.flip_display()
                                     has_acted = True 
                                 
                             # Si on est dans le menu d'attaque
@@ -155,12 +181,15 @@ class Game:
     def move_unit_multiple(self, selected_unit):
         """Permet à une unité de se déplacer plusieurs fois jusqu'à ce que l'utilisateur décide d'arrêter avec Espace."""
         running = True
+        Rlist = self.bfs_reachable(selected_unit) # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
+        print(Rlist)
+
 
         # Stocker les coordonnées initiales de l'unité pour calculer la distance parcourue
         start_x, start_y = selected_unit.x, selected_unit.y
 
         while running:
-            self.flip_display()  # Mettre à jour l'affichage
+            self.flip_display(Rlist)  # Mettre à jour l'affichage
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -190,8 +219,7 @@ class Game:
                     new_y = selected_unit.y + dy
 
                     # Vérification des limites de déplacement
-                    distance = abs(new_x - start_x) + abs(new_y - start_y)
-                    if distance > selected_unit.vitesse:
+                    if not (new_x,new_y) in Rlist:
                         print("Déplacement trop loin ! Mouvement annulé.")
                         continue
 
@@ -296,7 +324,7 @@ class Game:
             
 
 
-    def flip_display(self, attacking=False, Attack=None):
+    def flip_display(self, Rlist=None):
         """Affiche le jeu."""
 
         # Effacer l'écran (en dehors de la boucle principale pour éviter les flashs)
@@ -331,10 +359,14 @@ class Game:
             obj.draw(self.screen)
         
         # Afficher les attaques si nécessaire
-        if attacking:
-            Attack.draw(self.screen)
 
         # Rafraîchissement de l'écran
+        if Rlist != None:
+            for x, y in Rlist:
+                rect_x = x * CELL_SIZE
+                rect_y = y * CELL_SIZE
+                pygame.draw.rect(self.screen, YELLOW, (rect_x, rect_y, CELL_SIZE, CELL_SIZE), 1)
+
         pygame.display.flip()
 
     def game_over(self) :
@@ -450,9 +482,9 @@ class Game:
         print(f"{len(new_monsters)} monstres ont été ajoutés dans la salle {salle.id}.")
 
         
-    def debut_jeu(self,player_classe):
+    def debut_jeu(self):
         self.player_units = []
-        for i, player_class in enumerate(player_classe):
+        for i, player_class in enumerate(self.player_class):
             if player_class == "Mage":
                     self.player_units.append(Mage_player(i,0))
             elif player_class == "Vampire":
@@ -469,9 +501,8 @@ class Game:
         
 
 
-    def En_jeu(self,player_classe) : 
-        self = Game(self.screen,3,player_classe)
-        self.debut_jeu(player_classe)
+    def En_jeu(self) : 
+        self.debut_jeu()
         self.In_Game = True
         while True:
             self.handle_player_turn()
@@ -479,4 +510,21 @@ class Game:
             self.spawn_monsters(salles)
             self.game_over()
             
+def main():
+
+    # Initialisation de Pygame
+    pygame.init()
+
+    # Instanciation de la fenêtre
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Mon jeu de stratégie")
+
+    # Instanciation du jeu
+    Perso = ["Mage","Vampire","Guerrier"]
+    game = Game(screen,Perso)
+
+    # Boucle principale du jeu
+    game.En_jeu()
         
+if __name__ == "__main__":
+    main()
