@@ -293,21 +293,21 @@ while running:
                     if selected_option == 0:  
                         player_classe.append("Mage")
                         game = Game(screen,3,player_classe)
-                        In_Game = True
+                        game.In_Game = True
                         while True:
                             game.handle_player_turn()
                             game.handle_enemy_turn()
                     elif selected_option == 1:  
                         player_classe.append("Guerrier")
                         game = Game(screen,3,player_classe)
-                        In_Game = True
+                        game.In_Game = True
                         while True:
                             game.handle_player_turn()
                             game.handle_enemy_turn()
                     elif selected_option == 2:  
                         player_classe.append("Vampire")
                         game = Game(screen,3,player_classe)
-                        In_Game = True
+                        game.In_Game = True
                         while True:
                             game.handle_player_turn()
                             game.handle_enemy_turn()

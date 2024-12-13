@@ -30,6 +30,7 @@ class Game:
         """
         Initialise le jeu avec les paramètres nécessaires.
         """
+        self.In_Game = True
         self.screen = screen
         self.enemy_images = [image_mechant_guerier, image_mechant_vampire, image_mechant_mage]
         self.player_class = player_classe # liste des classes des joueurs 
@@ -311,6 +312,8 @@ class Game:
     def victoire() : 
         pass
 
+    def En_jeu(self) : 
+        pass 
 
 def main():
 
