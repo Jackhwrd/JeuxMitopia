@@ -35,9 +35,9 @@ def mur():
 
         # Salle 2
         ( (x == GRID_SIZE_H - 5) & (y >= centre_y - 5) & (y <= centre_y), #bon
-          (x == GRID_SIZE_H - 5) & (y <= 2), #bon
-          (x == GRID_SIZE_H - 9) & (y <= 2),
-          (x == GRID_SIZE_H - 13) & (y <= 2)),    #bon
+          (x == GRID_SIZE_H - 5) & (y <= 3), #bon
+          (x == GRID_SIZE_H - 9) & (y <= 3),
+          (x == GRID_SIZE_H - 13) & (y <= 3)),    #bon
         
         # Salle 3
         ( (x == 2) & (y >= 15), #bon
@@ -46,9 +46,19 @@ def mur():
           (x == 10) & (y >= centre_y + 3) & (y <= centre_y + 6), 
           (x >= 10) & (x <= 15) & (y == centre_y + 6)),    #bon
 
+        # Salle 4
+        ( (x == GRID_SIZE_H - 2) & (y >= centre_y) & (y < centre_y + 5),
+          (x == GRID_SIZE_H - 2) & (y > centre_y + 6),
+          (x == GRID_SIZE_H - 3) & (y >= centre_y) & (y < centre_y + 4),
+          (x == GRID_SIZE_H - 3) & (y > centre_y + 7),
+          (x == GRID_SIZE_H - 4) & (y == centre_y + 3),
+          (x == GRID_SIZE_H - 4) & (y == centre_y + 8)),    #bon
+        
         # Salle 5
         ( (x >= centre_x - 1) & (x <= centre_x + 1) & (y == centre_y ), #bon
-          (x == centre_x) & (y >= centre_y - 1) & (y <= centre_y + 1)),    #bon
+          (x == centre_x) & (y >= centre_y - 1) & (y <= centre_y + 1),
+          (x == centre_x + 5) & (y == centre_y - 4),
+          (x == centre_x + 5) & (y == centre_y + 4)),    #bon
     ]
 
     for condition in wall_conditions:
@@ -123,11 +133,19 @@ def get_cell_color(grid_x, grid_y, rooms, walls, salles):
     
     if room_id == 2:
         if is_near_wall(grid_x, grid_y, walls):
-            return (120, 0, 60)  # Marron (couleur Kaki) pour les cellules voisines des murs dans la salle 1
-
+            return (120, 0, 60)
+        
+    if room_id == 3:
+        if is_near_wall(grid_x, grid_y, walls):
+            return (95, 158, 160)
+    
+    if room_id == 4:
+        if is_near_wall(grid_x, grid_y, walls):
+            return (128, 0, 0)
+        
     if room_id == 5:
         if is_near_wall(grid_x, grid_y, walls):
-            return (100, 8, 30)  # Marron (couleur Kaki) pour les cellules voisines des murs dans la salle 1
+            return (50, 8, 0)  # Marron (couleur Kaki) pour les cellules voisines des murs dans la salle 1
 
 
     #if room == 5:
@@ -208,7 +226,7 @@ def generate_objects():
     """
     objets = [
         GameObject(4, 4, 'Clef', GREEN, WHITE),  # Exemple : une épée
-        GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE),  # badge
+        GameObject(centre_x - 2, centre_y - 2, 'Badge', BLUE, WHITE),  # badge
         GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', LIGHT_YELLOW, BLACK)  #pass
     ]
     return objets
