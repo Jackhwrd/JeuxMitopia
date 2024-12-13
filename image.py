@@ -9,6 +9,9 @@ image_status = pygame.image.load("image/mechant_status.png")
 image_mechant_guerier = pygame.image.load("image/mechant_guerier.png")
 image_mechant_vampire = pygame.image.load("image/mechant_vampire.png")
 image_mechant_mage = pygame.image.load("image/mechant_mage.png")
+image_guts = pygame.image.load("image/guts.jpeg")
+image_vampire = pygame.image.load("image/vampire.jpg")
+
 
 
 # Constantes
@@ -36,6 +39,8 @@ KAKI = (140, 130, 80)
 MAGE = (182,37,207)
 GUERRIER = (138,148,163)
 VAMPIRE = (161,0,0)
+background_color = (60, 63, 60)
+health_color = (111, 210, 46)
 
 # Initialisation de la police
 font = pygame.font.Font("acadian_runes/police.ttf", 80)  
@@ -44,3 +49,4 @@ font = pygame.font.Font("acadian_runes/police.ttf", 80)
 font_game = pygame.font.Font("acadian_runes/police.ttf", 48)
 font_credit = pygame.font.Font("acadian_runes/police.ttf", 40)  
 font_j = pygame.font.Font("acadian_runes/police.ttf", 20)
+font_affi_joueur = pygame.font.Font("acadian_runes/police.ttf", 30)

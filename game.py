@@ -42,21 +42,16 @@ class Game:
         self.player_units = []
         for i, player_class in enumerate(player_classe):
             if player_class == "Mage":
-                    self.player_units.append(Mage_player(0, i, 10, 3, image_croque_minou, 2, 5))
+                    self.player_units.append(Mage_player(i,0))
             elif player_class == "Vampire":
-                    self.player_units.append(Vampire_player(0, i, 8, 4, image_croque_minou, 3, 6))
+                    self.player_units.append(Vampire_player(i,0))
             elif player_class == "Guerrier":
-                    self.player_units.append(Guerrier_player(0, i, 12, 2, image_croque_minou, 4, 4))
+                    self.player_units.append(Guerrier_player(i,0))
 
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy',"Vampire",0,0),
-                            Unit(7, 6, 8, 1, 'enemy',"Vampire",0,0),
-                            Unit(8, 6, 8, 1, 'enemy',"Vampire",0,0)]
-       
-
-        # Associer les images des ennemis
-        for unit, image in zip(self.enemy_units, self.enemy_images):
-            unit.character_image = image
+        self.enemy_units = [Vampire_enemy(6,6),
+                            Vampire_enemy(7,6),
+                            Vampire_enemy(8,6)]
 
         # Prépare les rectangles pour les cellules de la grille
         self.grid_rects = [
@@ -68,22 +63,73 @@ class Game:
                 
     def handle_player_turn(self):
         """Tour du joueur"""
-        for selected_unit in self.player_units:
+        for rang_joueur, selected_unit in enumerate (self.player_units):
 
-            # Tant que l'unité n'a pas terminé son tour
-            has_acted = False
-            selected_unit.is_selected = True
-            self.flip_display()
-            while not has_acted:
+                
 
-                # Important: cette boucle permet de gérer les événements Pygame
-                for event in pygame.event.get():
+                # Tant que l'unité n'a pas terminé son tour
+                has_acted = False
+                selected_unit.is_selected = True
+                selecting_attack = False  # Flag pour savoir si on est dans le menu d'attaque
+                current_option = 0  # Option actuelle
+                selected_attack = 0  # Attaque actuellement sélectionnée
+                self.flip_display()
+                
+                while not has_acted: # tant que le tour du joueur n'est pas fini
+                    #affichage du numéros de joueur qui doit jouer 
 
-                    # Gestion de la fermeture de la fenêtre
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        exit()
+                    phrase = f"Joueur {rang_joueur + 1 }, à toi de jouer !"
+                    texte = font_affi_joueur.render(phrase, True, WHITE)
+                    text_rect = texte.get_rect(center=(540, 20))  # Espacement vertical entre les options
+                    self.screen.blit(texte, text_rect.topleft)
+                    
 
+                    # Boucle principale d'événements
+                    for event in pygame.event.get():
+                        # Gestion de la fermeture de la fenêtre
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+
+                        # Gestion des touches du clavier
+                        if event.type == pygame.KEYDOWN:
+                            # Si on n'est pas dans le menu d'attaque, afficher les options principales
+                            if not selecting_attack:
+                                # Déplacement du curseur entre "Avancer" et "Attaquer"
+                                if event.key == pygame.K_DOWN:
+                                    current_option = (current_option + 1) % 2
+                                elif event.key == pygame.K_UP:
+                                    current_option = (current_option - 1) % 2
+                                
+                                # Si l'option "Attaquer" est sélectionnée
+                                if event.key == pygame.K_RETURN and current_option == 1:
+                                    selecting_attack = True  # On passe dans le menu d'attaque
+                                    self.flip_display(attacking=False, Attack=None)
+
+                                # Si l'option "Avancer" est sélectionnée, on déplace l'unité
+                                if event.key == pygame.K_RETURN and current_option == 0:
+                                    self.move_unit_multiple(selected_unit)
+                                    self.flip_display(attacking=False, Attack=None)
+                                    has_acted = True 
+                                
+                            # Si on est dans le menu d'attaque
+                            else:
+                                # Sélection des attaques
+                                if event.key == pygame.K_DOWN:
+                                    selected_attack = (selected_attack + 1) % len(selected_unit.liste_attaque)
+                                elif event.key == pygame.K_UP:
+                                    selected_attack = (selected_attack - 1) % len(selected_unit.liste_attaque)
+
+                                # Si l'attaque est confirmée
+                                if event.key == pygame.K_RETURN:
+                                    
+                                    if selected_attack == 0:  
+                                        
+                                        selected_unit.attaque(selected_unit.liste_attaque[0],self)
+                                    elif selected_attack == 1:  
+                                        selected_unit.attaque(selected_unit.liste_attaque[1],self)
+                                    elif selected_attack == 2 : 
+                                        selected_unit.attaque(selected_unit.liste_attaque[0],self)
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
 
@@ -178,10 +224,32 @@ class Game:
                                     if enemy.health <= 0:
                                         self.enemy_units.remove(enemy)
 
-                            has_acted = True
-                            selected_unit.is_selected = False
+                                    has_acted = True
+                                    selected_unit.is_selected = False
 
-    
+                    # Affichage des options principales (Avancer ou Attaquer)
+                    if not selecting_attack:
+                        options = ["Avancer", "Attaquer"]
+                        for i, option in enumerate(options):
+                            color = BLUE if i == current_option else WHITE
+                            texte = font.render(option, True, color)
+                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                            self.screen.blit(texte, text_rect)
+                    
+                    # Affichage des attaques si l'option "Attaquer" est choisie
+                    else:
+                        for i, attack in enumerate(selected_unit.liste_attaque):
+                            color = BLUE if i == selected_attack else WHITE
+                            texte = font.render(attack, True, color)
+                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                            self.screen.blit(texte, text_rect)
+
+                    # Mise à jour de l'affichage
+                    pygame.display.flip()
+
+         
+
+        
 
 
     
@@ -227,6 +295,13 @@ class Game:
             if wall.collidepoint(x * CELL_SIZE, y * CELL_SIZE):
                 return True
         return False
+    
+    def is_occupied_by_unit(self, x, y):
+        """Vérifie si une case est occupée par une unité."""
+        for unit in self.player_units + self.enemy_units:
+            if unit.x == x and unit.y == y:
+                return True
+        return False
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -245,6 +320,44 @@ class Game:
                 enemy.attack(target)
                 if target.health <= 0:
                     self.player_units.remove(target)
+
+
+    def move_unit_multiple(self, unit):
+        """Permet au joueur de déplacer l'unité vers une position cible."""
+        target_x, target_y = unit.x, unit.y  # Position actuelle
+        while True:
+            # Afficher la grille avec la position cible surlignée
+            self.flip_display(attacking=False, Attack=None)
+            highlight_rect = pygame.Rect(target_x * CELL_SIZE, target_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(self.screen, YELLOW, highlight_rect, 3)  # Surligne la position cible
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.KEYDOWN:
+                    dx, dy = 0, 0
+                    if event.key == pygame.K_LEFT:
+                        dx = -1
+                    elif event.key == pygame.K_RIGHT:
+                        dx = 1
+                    elif event.key == pygame.K_UP:
+                        dy = -1
+                    elif event.key == pygame.K_DOWN:
+                        dy = 1
+
+                    # Mettre à jour la position cible
+                    new_x, new_y = target_x + dx, target_y + dy
+
+                    # Vérification si la nouvelle position est valide (pas un mur et pas occupée par une autre unité)
+                    if 0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V and not self.is_wall(new_x, new_y) and not self.is_occupied_by_unit(new_x, new_y):
+                        target_x, target_y = new_x, new_y
+
+                    # Valider le déplacement
+                    if event.key == pygame.K_RETURN:
+                        unit.x, unit.y = target_x, target_y
+                        return
 
     def flip_display(self, attacking=False, Attack=None):
         """Affiche le jeu."""
@@ -276,6 +389,7 @@ class Game:
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
+            unit.update_health_bar(self.screen)
 
         # Affiche les objets
         for obj in self.objects:
