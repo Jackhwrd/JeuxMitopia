@@ -15,7 +15,6 @@ screen = pygame.display.set_mode((1080, 720))
 
 arriere_plan = pygame.transform.scale(arriere_plan, (1080, 720))
 
-
 # Options du menu
 options = ["Jouer", "Son", "Crédit","Quitter"]
 selected_option = 0  # Index de l'option sélectionnée
@@ -250,6 +249,10 @@ while running:
                     selected_option = (selected_option + 1) % len(list_joueur)  # Passer à l'option suivante
                 elif event.key == pygame.K_UP:  # Flèche haut
                     selected_option = (selected_option - 1) % len(list_joueur)  # Revenir à l'option précédente
+             
+             
+             
+             
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  #choix du mage
                         player_classe.append(("Mage"))
@@ -292,25 +295,18 @@ while running:
                 elif event.key == pygame.K_RETURN:  # Touche Entrée
                     if selected_option == 0:  
                         player_classe.append("Mage")
-                        game = Game(screen,3,player_classe)
-                        game.In_Game = True
-                        while True:
-                            game.handle_player_turn()
-                            game.handle_enemy_turn()
+                        #instance de la classe main 
+                        game = Game(screen, 3, player_classe)
+                        game.En_jeu(player_classe)
                     elif selected_option == 1:  
                         player_classe.append("Guerrier")
-                        game = Game(screen,3,player_classe)
-                        game.In_Game = True
-                        while True:
-                            game.handle_player_turn()
-                            game.handle_enemy_turn()
+                        game = Game(screen, 3, player_classe)
+                        game.En_jeu(player_classe)
                     elif selected_option == 2:  
                         player_classe.append("Vampire")
-                        game = Game(screen,3,player_classe)
-                        game.In_Game = True
-                        while True:
-                            game.handle_player_turn()
-                            game.handle_enemy_turn()
+                        game = Game(screen, 3, player_classe)
+                        game.En_jeu(player_classe)
+                        scene_courant = "Menu principal"
                         
                     elif selected_option == 3 :
                         scene_courant = "Menu principal"

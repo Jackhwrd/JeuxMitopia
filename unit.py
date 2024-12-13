@@ -59,7 +59,7 @@ class Unit:
         self.character_image = image
         self.stat_defense = defe
         self.stat_attaque = attaque
-        self.vitess = vit
+        self.vitesse = vit
         self.has_object = []
         self.niveau = niveau  # Niveau du joueur
         self.max_health = 100

@@ -171,23 +171,29 @@ def generate_objects():
     ]
     return objets
 
-class salle :
-    def __init__(self, id, couleur, piège=False, enemy=None, objet=None, conditions=None):
-        """def __init__(self, id, couleur, piège=False, ennemis=None, artefact=None):
-    
-    Initialise une salle avec ses caractéristiques.
-    - id: identifiant de la salle (1, 2, 3, etc.)
-    - couleur: couleur de la salle.
-    - piège: booléen, s'il y a un piège dans la salle.
-    - ennemis: liste ou nombre d'ennemis dans la salle.
-    - artefact: description ou booléen pour savoir si un artefact est présent.
-    """
+class salle:
+    def __init__(self, id, couleur, piège=False, enemy=None, objet=None, conditions=None, x_min=0, x_max=10, y_min=0, y_max=10):
+        """Initialise une salle avec ses caractéristiques.
+        
+        Paramètres :
+            id (int): Identifiant de la salle (1, 2, 3, etc.).
+            couleur (str): Couleur de la salle.
+            piège (bool): Indique si la salle a un piège.
+            enemy (list or int): Liste ou nombre d'ennemis dans la salle.
+            objet (object): Un objet présent dans la salle (par exemple, une clé).
+            conditions (dict): Conditions nécessaires pour accéder à la salle.
+            x_min, x_max, y_min, y_max (int): Coordonnées de la salle (définit les limites de la salle).
+        """
         self.id = id
         self.couleur = couleur
         self.piège = piège
         self.enemy = enemy if enemy is not None else []
         self.objet = objet
-        self.conditions = conditions if conditions else {}  # Assurez un dictionnaire
+        self.conditions = conditions if conditions else {}
+        self.x_min = x_min
+        self.x_max = x_max
+        self.y_min = y_min
+        self.y_max = y_max
    
     def afficher_infos(self):
         print(f"Salle {self.id}:")
@@ -195,8 +201,10 @@ class salle :
         print(f"  Ennemis: {self.enemy}")
         print(f"  Objet: {self.objet if self.objet else 'Aucun'}")
         print(f"  Conditions : {self.conditions}")
-
+        print(f"  Coordonnées: x_min={self.x_min}, x_max={self.x_max}, y_min={self.y_min}, y_max={self.y_max}")
+        
     def verifier_conditions(self, unit):
+        # Vérifie les conditions de la salle (comme dans ton code précédent)
         for condition, valeur in self.conditions.items():
             if condition == "Clef" and not any(obj.name == "Clef" for obj in unit.has_object):
                 print("Condition manquante : clef requise.")
@@ -207,7 +215,6 @@ class salle :
             if condition == "Pierre de téléportation" and not any(obj.name == "Pierre de téléportation" for obj in unit.has_object):
                 print("Condition manquante : Pierre de téléportation requise.")
                 return False
-           
             if condition == "niveau_min" and unit.niveau < valeur:
                 print(f"Condition manquante : niveau {valeur} requis.")
                 return False
@@ -220,11 +227,12 @@ badge = GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE)
 pierre = GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', LIGHT_YELLOW, BLACK)  #pass
 
 
-cave = salle(1, KAKI, False, 3, objet=clef)
-sellier = salle(2, BROWN, False, 3, objet=pierre, conditions={"Badge": True})
-cuisines = salle(3, WHITE, False, 3, conditions={"Pierre de téléportation": True})
-ecuries = salle(4, YELLOW, False, 3)
-arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
+# Exemple de création de salles avec des coordonnées :
+cave = salle(1, KAKI, False, 3, objet="clef", x_min=0, x_max=5, y_min=0, y_max=5)
+sellier = salle(2, BROWN, False, 3, objet="pierre", conditions={"Badge": True}, x_min=6, x_max=10, y_min=0, y_max=5)
+cuisines = salle(3, WHITE, False, 3, conditions={"Pierre de téléportation": True}, x_min=0, x_max=5, y_min=6, y_max=10)
+ecuries = salle(4, YELLOW, False, 3, x_min=6, x_max=10, y_min=6, y_max=10)
+arene = salle(5, RED, False, 3, objet="badge", conditions={"Clef": True}, x_min=0, x_max=5, y_min=10, y_max=15)
 
 salles = [cave, sellier, cuisines, ecuries, arene]
 
