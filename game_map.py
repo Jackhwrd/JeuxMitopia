@@ -33,12 +33,22 @@ def mur():
          (x == 10) & (y >= 5) & (y <= centre_y - 3), #bon
          (x >= 11) & (x <= 15) & (y == 6)),
 
+        # Salle 2
+        ( (x == GRID_SIZE_H - 5) & (y >= centre_y - 5) & (y <= centre_y), #bon
+          (x == GRID_SIZE_H - 5) & (y <= 2), #bon
+          (x == GRID_SIZE_H - 9) & (y <= 2),
+          (x == GRID_SIZE_H - 13) & (y <= 2)),    #bon
+        
         # Salle 3
         ( (x == 2) & (y >= 15), #bon
           (x == 6) & (y >= centre_y) & (y <= GRID_SIZE_V - 3), #bon
           (x >= 7) & (x <= centre_x - 3) & (y == GRID_SIZE_V - 3), #bon
           (x == 10) & (y >= centre_y + 3) & (y <= centre_y + 6), 
           (x >= 10) & (x <= 15) & (y == centre_y + 6)),    #bon
+
+        # Salle 5
+        ( (x >= centre_x - 1) & (x <= centre_x + 1) & (y == centre_y ), #bon
+          (x == centre_x) & (y >= centre_y - 1) & (y <= centre_y + 1)),    #bon
     ]
 
     for condition in wall_conditions:
@@ -110,12 +120,21 @@ def get_cell_color(grid_x, grid_y, rooms, walls, salles):
     if room_id == 1:
         if is_near_wall(grid_x, grid_y, walls):
             return BROWN  # Marron (couleur Kaki) pour les cellules voisines des murs dans la salle 1
+    
+    if room_id == 2:
+        if is_near_wall(grid_x, grid_y, walls):
+            return (120, 0, 60)  # Marron (couleur Kaki) pour les cellules voisines des murs dans la salle 1
+
+    if room_id == 5:
+        if is_near_wall(grid_x, grid_y, walls):
+            return (100, 8, 30)  # Marron (couleur Kaki) pour les cellules voisines des murs dans la salle 1
+
 
     #if room == 5:
     # Si la salle a un piège et est proche d'un mur
     if salle.piège and is_near_wall(grid_x, grid_y, walls):
         return BROWN  # Couleur pour une cellule piège  
-
+    
     # Sinon, retourne la couleur de la salle
     return salle.couleur  
 
@@ -251,7 +270,7 @@ pierre = GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', LIG
 
 
 cave = salle(1, KAKI, False, 3, objet=clef)
-sellier = salle(2, BROWN, False, 3, objet=pierre, conditions={"Badge": True})
+sellier = salle(2, (0, 255, 0), False, 3, objet=pierre, conditions={"Badge": True})
 cuisines = salle(3, WHITE, False, 3, conditions={"Pierre de téléportation": True})
 ecuries = salle(4, YELLOW, False, 3)
 arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
