@@ -85,7 +85,6 @@ class Unit:
         self.niveau = niveau  # Niveau du joueur
         self.max_health = 100
         self.en_vie = True 
-        self.attaque = None
         
         
 

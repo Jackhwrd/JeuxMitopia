@@ -26,7 +26,7 @@ class Mage_player(Unit):
 
     def Regene(self,game):
         """attaque qui permet de se regenerer avec la vie d'un ennemie ou de donner de la vie à un joueur"""
-
+        print("dans attaque regene")
         for enemy in game.enemy_units: #pour prendre la vie d'un monstre 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
             if 0 <= distance < 2:  # pour les 8 cases autour du joueur 
@@ -64,7 +64,7 @@ class Mage_player(Unit):
         else : 
             self.stat_attaque -= 0.05
 
-        for ami in game.player_unit:
+        for ami in game.player_units:
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
             if 0 <= distance <= 2:  # pour les 8 cases autour du joueur 
 
@@ -84,15 +84,14 @@ class Mage_player(Unit):
         
         return degat_final-(degat*self.stat_defense)
     
-    def attaque(self,attaque_choisie,game):
-        
-        if attaque_choisie == "Longue attaque":
-
-            self.Longue_attaque(game)
-        elif attaque_choisie == "Régène" : 
-            self.Regene(game)
-        elif attaque_choisie == "Bouclier" : 
-            self.Bouclier(game)
+#    def attaque(self,attaque_choisie,game):
+#        
+#        if attaque_choisie == "Longue attaque":
+#            self.Longue_attaque(game)
+#        elif attaque_choisie == "Régène" : 
+#            self.Regene(game)
+#        elif attaque_choisie == "Bouclier" : 
+#            self.Bouclier(game)
 
     def vise_attaque(self,attaque_choisie,game):
         
@@ -159,22 +158,22 @@ class Vampire_player(Unit):
                 
                 self.stat_attaque += 0.1
 
-    def execute_attaque(self,attaque_choisie,game):
-        
+# def attaque(self, attaque_choisie, game):
+#     if attaque_choisie == "Vampiriser":
+#         self.Vampiriser(game)
+#     elif attaque_choisie == "Furtif":
+#         self.Furtif(game)
+#     elif attaque_choisie == "Brouiller":
+#         self.Brouiller(game)
+
+
+    def vise_attaque(self,attaque_choisie,game):
         if attaque_choisie == "Vampiriser":
-            self.Vampiriser(game)
+            return Attaque("Vampiriser", 15, self.x, self.y, image_viseur)
         elif attaque_choisie == "Furtif" : 
             self.Furtif(game)
         elif attaque_choisie == "Brouiller" : 
             self.Brouiller(game)
-
- #   def vise_attaque(self,attaque_choisie,game):
- #       if attaque_choisie == "Vampiriser":
- #           self.Vampiriser(game)
- #       elif attaque_choisie == "Furtif" : 
- #           self.Furtif(game)
- #       elif attaque_choisie == "Brouiller" : 
- #           self.Brouiller(game)
         
 
     def degat_subit(self,monstre,degat):
@@ -241,10 +240,19 @@ class Guerrier_player(Unit):
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
                     
-    def attaque(self,attaque_choisie,game):
+# def attaque(self, attaque_choisie, game):
+
+#     if attaque_choisie == "Frappe":
+#         self.Frappe(game)
+#     elif attaque_choisie == "Intimidation":
+#         self.Intimidation(game)
+#     elif attaque_choisie == "Attaque de groupe":
+#         self.Attaque_de_groupe(game)
+
+    def vise_attaque(self,attaque_choisie,game):
         
-        if attaque_choisie == "Frappe":
-            self.Frappe(game)
+        if attaque_choisie == "Vampiriser":
+            return Attaque("Vampiriser", 15, self.x, self.y, image_viseur)
         elif attaque_choisie == "Intimidation" : 
             self.Intimidation(game)
         elif attaque_choisie == "Attaque de groupe" : 
@@ -464,7 +472,7 @@ class Mage_enemy(Unit):
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
 
-        for ami in game.enemy_unit:
+        for ami in game.enemy_units:
 
             vie = self.health * 0.15 # pour prendre 15% de la vie restante lors du tour 
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
@@ -485,7 +493,7 @@ class Mage_enemy(Unit):
         else : 
             self.stat_attaque -= 0.05
 
-        for ami in game.enemy_unit:
+        for ami in game.enemy_units:
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
             if 0 <= distance <= 2:  # pour les 8 cases autour du joueur 
 

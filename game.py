@@ -165,10 +165,10 @@ class Game:
         if selected_attack == 0:  
             Attack = selected_unit.vise_attaque(selected_unit.liste_attaque[0],self)
         elif selected_attack == 1:  
-            selected_unit.attaque(selected_unit.liste_attaque[1],self)
+            selected_unit.vise_attaque(selected_unit.liste_attaque[1],self)
             return True
         elif selected_attack == 2 : 
-            selected_unit.attaque(selected_unit.liste_attaque[2],self)
+            selected_unit.vise_attaque(selected_unit.liste_attaque[2], self)
             return True
         
         running = True # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
@@ -349,7 +349,7 @@ class Game:
                         enemy.move(dx, dy)
                     #choix d'une attaque aléatoire
                     attaque_choix = random.randint(0, 2)
-                    enemy.attaque(self, enemy.liste_attaque[attaque_choix])
+                    enemy.attaque(enemy.liste_attaque[attaque_choix], self)
                 else:
                     continue
 
@@ -364,8 +364,8 @@ class Game:
                 if 0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V and not self.is_wall(new_x, new_y) and not self.is_occupied_by_unit( new_x, new_y):
                     enemy.move(dx, dy)
 
-                attaque_choix = random.randint(0, 2)
-                enemy.attaque(self, enemy.liste_attaque[attaque_choix])
+                attaque_choix = random.randint(1, 2)
+                enemy.attaque(enemy.liste_attaque[attaque_choix], self)
 
             
 
