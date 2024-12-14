@@ -6,7 +6,7 @@ from game import *
 
 class Mage_player(Unit):
     def __init__(self, x, y):
-        super().__init__(x, y, 8, 'player', image_croque_minou, 0.8,1,1)
+        super().__init__(x, y, 14, 'player', image_croque_minou, 0.8,1,6)
         self.liste_attaque = ["Longue attaque", "Régène", "Bouclier"]
         self.type = "Mage"
 
@@ -15,7 +15,7 @@ class Mage_player(Unit):
         
         for enemy in game.enemy_units:
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 4 <= distance <= 6:  # Entre 4 et 6 cases de distance
+            if 3 <= distance <= 6:  # Entre 4 et 6 cases de distance
 
                 degat = self.puissance_attaque * self.stat_attaque*0.85
                 degat_final = enemy.degat_subit(self, degat)
@@ -27,14 +27,17 @@ class Mage_player(Unit):
     def Regene(self,game):
         """attaque qui permet de se regenerer avec la vie d'un ennemie ou de donner de la vie à un joueur"""
 
-        for enemy in game.enemy_units: #pour prendre la vie d'un montre 
+        for enemy in game.enemy_units: #pour prendre la vie d'un monstre 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 1:  # pour les 8 cases autour du joueur 
+            if 0 <= distance < 2:  # pour les 8 cases autour du joueur 
 
                 degat = self.puissance_attaque * self.stat_attaque
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
-                self.health += degat_final / 2 #pour recupere la moitier de la vie prise 
+                if self.health + degat_final / 2 <= self.max_health :
+                    self.health += degat_final / 2 #pour recupere la moitier de la vie prise 
+                else :
+                    self.health = self.max_health
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
                 break 
@@ -43,10 +46,13 @@ class Mage_player(Unit):
 
             vie = self.health * 0.15 # pour prendre 15% de la vie restante lors du tour 
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
-            if 1 <= distance <= 1 :  #pour les 8 cases autour du joueur 
+            if 0 <= distance < 2 :  #pour les 8 cases autour du joueur 
 
+                if ami.health + vie / 2 <= ami.max_health :
+                    ami.health += vie / 2 #pour recupere la moitier de la vie prise 
+                else :
+                    ami.health = self.max_health
                 
-                ami.health += vie 
                 self.health -= vie 
 
     def Bouclier(self,game): 
@@ -59,7 +65,7 @@ class Mage_player(Unit):
 
         for ami in game.player_unit:
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
-            if 1 <= distance <= 1:  # pour les 8 cases autour du joueur 
+            if 0 <= distance <= 2:  # pour les 8 cases autour du joueur 
 
                 ami.stat_defense += 0.1
         
@@ -72,6 +78,8 @@ class Mage_player(Unit):
             degat_final = degat*2
         elif monstre.type == "Guerrier": 
             degat_final = degat / 2
+        else : 
+            degat_final = degat
         
         return degat_final-(degat*self.stat_defense)
     
@@ -85,11 +93,20 @@ class Mage_player(Unit):
         elif attaque_choisie == "Bouclier" : 
             self.Bouclier(game)
 
+    def vise_attaque(self,attaque_choisie,game):
+        
+        if attaque_choisie == "Longue attaque":
+            return Attaque("Longue attaque", 15, self.x, self.y, image_viseur)
+        elif attaque_choisie == "Régène" : 
+            self.Regene(game)
+        elif attaque_choisie == "Bouclier" : 
+            self.Bouclier(game)
+
 class Vampire_player(Unit):
 
     
     def __init__(self, x, y):
-        super().__init__(x, y, 10, 'player', image_vampire, 0.5,1, 1)
+        super().__init__(x, y, 20, 'player', image_vampire, 0.5,1, 9)
         self.liste_attaque = ["Vampiriser", "Furtif", "Brouiller"]
         self.type = "Vampire"
 
@@ -97,12 +114,16 @@ class Vampire_player(Unit):
         """Prend de la vie de tout les monstres dans un rayon de 2 block au alentour"""
         for enemy in game.enemy_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 2:  # pour les 17 cases autour du joueur 
+            if 0 <= distance <3:  # pour les 17 cases autour du joueur 
 
                 degat = self.puissance_attaque * self.stat_attaque * 0.85 # pour dimunier la puissance de l'attaque
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
-                self.health += degat_final / 2  #pour recupere la moitier de la vie prise 
+                if self.health + degat_final / 2 <= self.max_health :
+                    self.health += degat_final / 2 #pour recupere la moitier de la vie prise 
+                else :
+                    self.health = self.max_health
+                 
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
     
@@ -110,20 +131,20 @@ class Vampire_player(Unit):
         "Tape un adversaire qui se trouve dans un rayon de 4 Block "
         for enemy in game.enemy_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 4:  
+            if 0 <= distance <= 4:  
 
                 degat = self.puissance_attaque * self.stat_attaque
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
-            break 
+                break 
 
     def Brouiller(self,game) : 
         """ Fait baisser la defense des adversaire dans un rayon de 2 block autour d'elle, et recuper cette stat en attaque, sa defense baisse légérement"""
         for enemy in game.enemy_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 2:   
+            if 0 <= distance < 3:   
                 
                 if self.stat_defense - 0.05 <= 0.1 : # pour eviter d'avoir un puissance d'attaque nuls et de ne plus pouvoir attaquer
                     self.stat_defense = 0.1
@@ -137,7 +158,7 @@ class Vampire_player(Unit):
                 
                 self.stat_attaque += 0.1
 
-    def attaque(self,attaque_choisie,game):
+    def execute_attaque(self,attaque_choisie,game):
         
         if attaque_choisie == "Vampiriser":
             self.Vampiriser(game)
@@ -145,6 +166,15 @@ class Vampire_player(Unit):
             self.Furtif(game)
         elif attaque_choisie == "Brouiller" : 
             self.Brouiller(game)
+
+ #   def vise_attaque(self,attaque_choisie,game):
+ #       if attaque_choisie == "Vampiriser":
+ #           self.Vampiriser(game)
+ #       elif attaque_choisie == "Furtif" : 
+ #           self.Furtif(game)
+ #       elif attaque_choisie == "Brouiller" : 
+ #           self.Brouiller(game)
+        
 
     def degat_subit(self,monstre,degat):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """
@@ -155,12 +185,14 @@ class Vampire_player(Unit):
             degat_final = degat
         elif monstre.type == "Guerrier": 
             degat_final = degat * 2
+        else :
+            degat_final = degat
             
         return degat_final-(degat*self.stat_defense)
 
 class Guerrier_player(Unit):
     def __init__(self, x, y):
-        super().__init__(x, y, 12, 'player', image_guts, 0.3,1, 1)
+        super().__init__(x, y, 25, 'player', image_guts, 0.3,1, 12)
         self.liste_attaque = ["Frappe", "Intimidation", "Attaque de groupe"]
         self.type = "Guerrier"
 
@@ -168,7 +200,7 @@ class Guerrier_player(Unit):
         """frappe un enemie dans une zone de 1 carreaux"""
         for enemy in game.enemy_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 1:  
+            if 0 <= distance <= 2:  
 
                 degat = self.puissance_attaque * self.stat_attaque
                 degat_final = enemy.degat_subit(self, degat)
@@ -200,7 +232,7 @@ class Guerrier_player(Unit):
 
         for enemy in game.enemy_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 2:  
+            if 0 <= distance <3:  
 
                 degat = self.puissance_attaque * self.stat_attaque * 0.85
                 degat_final = enemy.degat_subit(self, degat)
@@ -227,13 +259,15 @@ class Guerrier_player(Unit):
             degat_final = degat/2
         elif monstre.type == "Guerrier": 
             degat_final = degat 
+        else : 
+            degat_final = degat
             
-        return degat_final-(degat_final*self.defense)
+        return degat_final-(degat_final*self.stat_defense)
     
 
 class Vampire_enemy(Unit):
     def __init__(self, x, y):
-        super().__init__(x, y, 10, 'enemy', image_mechant_vampire,0.5,1,1)
+        super().__init__(x, y, 14, 'enemy', image_mechant_vampire,0.5,1,5)
         self.liste_attaque = ["Vampiriser", "Furtif", "Brouiller"]
         self.type = "Vampire"
 
@@ -241,12 +275,15 @@ class Vampire_enemy(Unit):
         """Prend de la vie de tout les monstres dans un rayon de 2 block au alentour"""
         for enemy in game.player_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 2:  # pour les 17 cases autour du joueur 
+            if 0 <= distance <= 2:  # pour les 17 cases autour du joueur 
 
                 degat = self.puissance_attaque * self.stat_attaque * 0.85 # pour dimunier la puissance de l'attaque
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
-                self.health += degat_final / 2  #pour recupere la moitier de la vie prise 
+                if self.health + degat_final / 2 <= self.max_health :
+                    self.health += degat_final / 2 #pour recupere la moitier de la vie prise 
+                else :
+                    self.health = self.max_health
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
     
@@ -254,7 +291,7 @@ class Vampire_enemy(Unit):
         "Tape un adversaire qui se trouve dans un rayon de 4 Block "
         for enemy in game.player_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 4:  
+            if 0 <= distance <= 4:  
 
                 degat = self.puissance_attaque * self.stat_attaque
                 degat_final = enemy.degat_subit(self, degat)
@@ -267,7 +304,7 @@ class Vampire_enemy(Unit):
         """ Fait baisser la defense des adversaire dans un rayon de 2 block autour d'elle, et recuper cette stat en attaque, sa defense baisse légérement"""
         for enemy in game.player_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 2:   
+            if 0 <= distance <= 2:   
                 if self.stat_defense - 0.05 <= 0.1 : # pour eviter d'avoir un puissance d'attaque nuls et de ne plus pouvoir attaquer
                     self.stat_defense = 0.1
                 else : 
@@ -305,15 +342,15 @@ class Vampire_enemy(Unit):
 
 class Guerrier_enemy(Unit):
     def __init__(self, x, y):
-        super().__init__(x, y, 10, 'enemy', image_mechant_vampire,0.5,1,1)
-        self.liste_attaque = ["Vampiriser", "Furtif", "Brouiller"]
-        self.type = "Vampire"
+        super().__init__(x, y, 17, 'enemy', image_mechant_guerier ,0.5,1,7)
+        self.liste_attaque = ["Frappe", "Intimidation", "Attaque de groupe"]
+        self.type = "Guerrier"
 
     def Frappe(self,game): 
         """frappe un enemie dans une zone de 1 carreaux"""
         for enemy in game.player_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 1:  
+            if 0 <= distance <= 2:  
 
                 degat = self.puissance_attaque * self.stat_attaque
                 degat_final = enemy.degat_subit(self, degat)
@@ -345,7 +382,7 @@ class Guerrier_enemy(Unit):
 
         for enemy in game.player_units: 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 2:  
+            if 0 <= distance < 3:  
 
                 degat = self.puissance_attaque * self.stat_attaque * 0.85
                 degat_final = enemy.degat_subit(self, degat)
@@ -373,13 +410,13 @@ class Guerrier_enemy(Unit):
         elif monstre.type == "Guerrier": 
             degat_final = degat 
             
-        return degat_final-(degat_final*self.defense)
+        return degat_final-(degat*self.stat_defense)
     
 class Mage_enemy(Unit):
     def __init__(self, x, y):
-        super().__init__(x, y, 10, 'enemy', image_mechant_mage,0.5,1,1)
-        self.liste_attaque = ["Vampiriser", "Furtif", "Brouiller"]
-        self.type = "Vampire"
+        super().__init__(x, y, 12, 'enemy', image_mechant_mage,0.5,1,3)
+        self.liste_attaque = ["Longue attaque", "Régène", "Bouclier"]
+        self.type = "Mage"
 
     def degat_subit(self,monstre,degat):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """
@@ -395,7 +432,7 @@ class Mage_enemy(Unit):
     def Longue_attaque(self, game):
         """Attaque à distance sur les ennemis qui sont dans une zone d'attaque de 4 à 6 carreaux."""
         
-        for enemy in game.enemy_units:
+        for enemy in game.player_units:
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
             if 4 <= distance <= 6:  # Entre 4 et 6 cases de distance
 
@@ -413,12 +450,16 @@ class Mage_enemy(Unit):
 
         for enemy in game.player_units: #pour prendre la vie d'un montre 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 1 <= distance <= 1:  # pour les 8 cases autour du joueur 
+            if 0 <= distance <= 2:  # pour les 8 cases autour du joueur 
 
                 degat = self.puissance_attaque * self.stat_attaque
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
-                self.health += degat_final / 2 #pour recupere la moitier de la vie prise 
+                if self.health + degat_final / 2 <= self.max_health :
+                    self.health += degat_final / 2 #pour recupere la moitier de la vie prise 
+                else :
+                    self.health = self.max_health
+                
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
 
@@ -426,10 +467,13 @@ class Mage_enemy(Unit):
 
             vie = self.health * 0.15 # pour prendre 15% de la vie restante lors du tour 
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
-            if 1 <= distance <= 1 :  #pour les 8 cases autour du joueur 
+            if 0<= distance <= 2 :  #pour les 8 cases autour du joueur 
 
+                if ami.health + vie / 2 <= ami.max_health :
+                    ami.health += vie / 2 #pour recupere la moitier de la vie prise 
+                else :
+                    ami.health = self.max_health
                 
-                ami.health += vie 
                 self.health -= vie 
 
     def Bouclier(self,game): 
@@ -442,7 +486,7 @@ class Mage_enemy(Unit):
 
         for ami in game.enemy_unit:
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
-            if 1 <= distance <= 1:  # pour les 8 cases autour du joueur 
+            if 0 <= distance <= 2:  # pour les 8 cases autour du joueur 
 
                 ami.stat_defense += 0.1
 
@@ -455,3 +499,124 @@ class Mage_enemy(Unit):
             self.Regene(game)
         elif attaque_choisie == "Bouclier" : 
             self.Bouclier(game)
+
+class Status_enemy(Unit):
+    def __init__(self, x, y):
+        super().__init__(x, y, 10, 'enemy', image_status,0.8,1,2)
+        self.liste_attaque = ["Peur", "Onde de choc ", "Touche loin"]
+        self.type = "Status"
+
+
+    def Peur(self,game) : 
+        for enemy in game.player_units:
+            """Fait peur au joueur se trouvant dans un rayon de 3 block au alentour, fait baisser leur attaque """
+
+            if enemy.stat_attaque - 0.1 <= 0.1 : # pour eviter d'avoir un puissance d'attaque nuls et de ne plus pouvoir attaquer
+                    enemy.stat_attaque = 0.1
+            else : 
+                enemy.stat_attaque -= 0.1  
+
+    def Onde_de_choc(self,game) : 
+        for enemy in game.player_units:
+            distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
+            if 0 <= distance <= 2:  
+
+                degat = self.puissance_attaque * self.stat_attaque
+                degat_final = enemy.degat_subit(self, degat)
+                enemy.update_health(degat_final)
+                
+                if not enemy.en_vie:
+                    game.enemy_units.remove(enemy)
+
+    def Touche_loin(self,game) : 
+        for enemy in game.player_units:
+            distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
+            if 3 <= distance <= 5 :  
+
+                degat = self.puissance_attaque * self.stat_attaque
+                degat_final = enemy.degat_subit(self, degat)
+                enemy.update_health(degat_final)
+                
+                if not enemy.en_vie:
+                    game.enemy_units.remove(enemy)
+                break
+
+    def degat_subit(self,monstre,degat):
+        """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """
+        if monstre.type == "Mage": 
+            degat_final = degat *1.25
+        elif monstre.type == "Vampire" : 
+            degat_final = degat*1.25
+        elif monstre.type == "Guerrier": 
+            degat_final = degat *0.75
+        else : 
+            degat_final = degat 
+        
+        return degat_final-(degat*self.stat_defense)
+    
+    def attaque(self,attaque_choisie,game):
+        
+        if attaque_choisie == "Peur":
+
+            self.Peur(game)
+        elif attaque_choisie == "Onde de choc" : 
+            self.Onde_de_choc(game)
+        elif attaque_choisie == "Touche loin" : 
+            self.Touche_loin(game)
+
+
+class Roi_enemy(Unit):
+    def __init__(self, x, y):
+        super().__init__(x, y, 20, 'enemy', image_roi ,0.8,1,2)
+        self.liste_attaque = ["Peur", "Onde de choc ", "Invoquer"]
+        self.type = "Roi"
+        self.health = 150
+        self.max_health = 150
+
+
+    def Peur(self,game) : 
+        for enemy in game.player_units:
+            """Fait peur au joueur se trouvant dans un rayon de 3 block au alentour, fait baisser leur attaque """
+            
+            if enemy.stat_attaque - 0.1 <= 0.1 : # pour eviter d'avoir un puissance d'attaque nuls et de ne plus pouvoir attaquer
+                    enemy.stat_attaque = 0.1
+            else : 
+                enemy.stat_attaque -= 0.1  
+
+    def Onde_de_choc(self,game) : 
+        for enemy in game.player_units:
+            distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
+            if 0 <= distance <= 3:  
+
+                degat = self.puissance_attaque * self.stat_attaque
+                degat_final = enemy.degat_subit(self, degat)
+                enemy.update_health(degat_final)
+                
+                if not enemy.en_vie:
+                    game.enemy_units.remove(enemy)
+
+    def Invoquer(self,game) : 
+        game.create_monsters_in_room(self, 5)
+
+    def degat_subit(self,monstre,degat):
+        """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """
+        if monstre.type == "Mage": 
+            degat_final = degat *0.75
+        elif monstre.type == "Vampire" : 
+            degat_final = degat*0.75
+        elif monstre.type == "Guerrier": 
+            degat_final = degat *1.25
+        else : 
+            degat_final = degat 
+        
+        return degat_final-(degat*self.stat_defense)
+    
+    def attaque(self,attaque_choisie,game):
+        
+        if attaque_choisie == "Peur":
+
+            self.Peur(game)
+        elif attaque_choisie == "Onde de choc" : 
+            self.Onde_de_choc(game)
+        elif attaque_choisie == "Invoquer" : 
+            self.Invoquer(game)

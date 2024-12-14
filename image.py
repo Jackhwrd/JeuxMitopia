@@ -1,19 +1,6 @@
 import pygame 
 pygame.font.init()
 
-#permet l'import de toute les images du jeu
-arriere_plan = pygame.image.load("image/ecran_titre.JPG")
-image_croque_minou = pygame.image.load("image/Croque_minou.png")
-image_roi = pygame.image.load("image/roi.png")
-image_status = pygame.image.load("image/mechant_status.png")
-image_mechant_guerier = pygame.image.load("image/mechant_guerier.png")
-image_mechant_vampire = pygame.image.load("image/mechant_vampire.png")
-image_mechant_mage = pygame.image.load("image/mechant_mage.png")
-image_guts = pygame.image.load("image/guts.jpeg")
-image_vampire = pygame.image.load("image/vampire.jpg")
-
-
-
 # Constantes
 GRID_SIZE_V = 24
 GRID_SIZE_H = 40
@@ -41,6 +28,20 @@ GUERRIER = (138,148,163)
 VAMPIRE = (161,0,0)
 background_color = (60, 63, 60)
 health_color = (111, 210, 46)
+
+#permet l'import de toute les images du jeu
+arriere_plan = pygame.image.load("image/ecran_titre.JPG")
+image_croque_minou = pygame.image.load("image/Croque_minou.png")
+image_roi = pygame.image.load("image/roi.png")
+image_status = pygame.image.load("image/mechant_status.png")
+image_mechant_guerier = pygame.image.load("image/mechant_guerier.png")
+image_mechant_vampire = pygame.image.load("image/mechant_vampire.png")
+image_mechant_mage = pygame.image.load("image/mechant_mage.png")
+image_guts = pygame.image.load("image/guts.jpeg")
+image_vampire = pygame.image.load("image/vampire.jpg")
+image_viseur = pygame.Surface((CELL_SIZE, CELL_SIZE), pygame.SRCALPHA)
+pygame.draw.circle(image_viseur, RED, (CELL_SIZE // 2, CELL_SIZE // 2), CELL_SIZE // 3, width=5)
+
 
 # Initialisation de la police
 font = pygame.font.Font("acadian_runes/police.ttf", 80)  

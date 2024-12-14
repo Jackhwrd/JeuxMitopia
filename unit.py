@@ -3,6 +3,27 @@ import random
 from image import *
 
 
+class Attaque:
+    def __init__(self, name, r, x, y, shape, pen_walls = False):
+        self.name = name
+        self.range = r         
+        self.x = x
+        self.y = y
+        self.shape = shape
+        self.walls = pen_walls
+
+    def move(self, dx, dy):
+        """Déplace l'unité de dx, dy."""
+        if 0 <= self.x + dx < GRID_SIZE_H and 0 <= self.y + dy < GRID_SIZE_V :
+            self.x += dx
+            self.y += dy
+
+
+    def draw(self,screen):
+        screen.blit(self.shape,(self.x*CELL_SIZE,self.y*CELL_SIZE)) 
+
+
+
 class Unit:
 
     def __init__(self, x, y, attack_power, team,image,defe,attaque,vit,niveau = 1):
@@ -32,11 +53,12 @@ class Unit:
         self.character_image = image
         self.stat_defense = defe
         self.stat_attaque = attaque
-        self.vitess = vit
+        self.vitesse = vit
         self.has_object = []
         self.niveau = niveau  # Niveau du joueur
         self.max_health = 100
         self.en_vie = True 
+        self.attaque = None
         
         
 
@@ -68,8 +90,9 @@ class Unit:
             pygame.draw.circle(screen, color, 
                             (self.x * CELL_SIZE + CELL_SIZE // 2, 
                                 self.y * CELL_SIZE + CELL_SIZE // 2), 
-                            CELL_SIZE // 3)
-            
+                            CELL_SIZE // 3) 
+
+
     def augmenter_niveau(self):
         self.niveau += 1
         print(f"Votre niveau a augmenté : {self.niveau}")
