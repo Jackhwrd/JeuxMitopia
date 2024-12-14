@@ -10,19 +10,23 @@ class Mage_player(Unit):
         self.liste_attaque = ["Longue attaque", "Régène", "Bouclier"]
         self.type = "Mage"
 
-    def Longue_attaque(self, game):
+    def Longue_attaque(self, game, attaque):
         """Attaque à distance sur les ennemis qui sont dans une zone d'attaque de 4 à 6 carreaux avec un peu moins de puissance"""
+        x, y = attaque.x, attaque.y
+        if game.is_occupied_by_enemy(x, y):
+            enemy = game.unit_at_position(x, y)
+            degat = self.puissance_attaque * self.stat_attaque*0.85
+            degat_final = enemy.degat_subit(self, degat)
+            enemy.update_health(degat_final)
+            print(f"Enemy {enemy.type} est frappée et reçoit {degat_final} points de dégats")
+            if not enemy.en_vie:
+                game.enemy_units.remove(enemy)
+                print(f"Enemy {enemy.type} est mort!")
+        else:
+            print("Il faut selectionner un enemy!")
+            return False
         
-        for enemy in game.enemy_units:
-            distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 3 <= distance <= 6:  # Entre 4 et 6 cases de distance
-
-                degat = self.puissance_attaque * self.stat_attaque*0.85
-                degat_final = enemy.degat_subit(self, degat)
-                enemy.update_health(degat_final)
-                
-                if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+        return True
 
     def Regene(self,game):
         """attaque qui permet de se regenerer avec la vie d'un ennemie ou de donner de la vie à un joueur"""
@@ -96,11 +100,16 @@ class Mage_player(Unit):
     def vise_attaque(self,attaque_choisie,game):
         
         if attaque_choisie == "Longue attaque":
-            return Attaque("Longue attaque", 15, self.x, self.y, image_viseur)
+            return Attaque("Longue attaque", 15, self.x, self.y, image_viseur, (0,0))
         elif attaque_choisie == "Régène" : 
             self.Regene(game)
         elif attaque_choisie == "Bouclier" : 
             self.Bouclier(game)
+
+    def execute_attaque(self,game,attaque=None):
+        
+        if attaque.name == "Longue attaque":
+            return self.Longue_attaque(game,attaque)
 
 class Vampire_player(Unit):
 
@@ -112,10 +121,12 @@ class Vampire_player(Unit):
 
     def Vampiriser(self,game) :
         """Prend de la vie de tout les monstres dans un rayon de 2 block au alentour"""
+        n_enemy = 0
+        hp_gagné = 0
         for enemy in game.enemy_units: 
-            distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 0 <= distance <3:  # pour les 17 cases autour du joueur 
-
+            #distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
+            #if 0 <= distance <3:  # pour les 17 cases autour du joueur 
+            if abs(self.x - enemy.x) < 3 and abs(self.y - enemy.y) < 3:
                 degat = self.puissance_attaque * self.stat_attaque * 0.85 # pour dimunier la puissance de l'attaque
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
@@ -126,6 +137,17 @@ class Vampire_player(Unit):
                  
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
+                    print(f"enemy {enemy.type} est mort!")
+                
+                n_enemy += 1
+                hp_gagné += degat_final / 2
+        
+        if n_enemy:
+            print(f"Batorie vampirise {n_enemy} et regagne {hp_gagné} points de vie")
+        else:
+            print(f"Batorie a completement raté son attaque???")
+
+        return True
     
     def Furtif(self,game) : 
         "Tape un adversaire qui se trouve dans un rayon de 4 Block "
@@ -169,11 +191,16 @@ class Vampire_player(Unit):
 
     def vise_attaque(self,attaque_choisie,game):
         if attaque_choisie == "Vampiriser":
-            return Attaque("Vampiriser", 15, self.x, self.y, image_viseur)
+            return Attaque("Vampiriser", 0, self.x, self.y, zone_vampiriser, (-2,-2))
         elif attaque_choisie == "Furtif" : 
             self.Furtif(game)
         elif attaque_choisie == "Brouiller" : 
             self.Brouiller(game)
+    
+    def execute_attaque(self,game,attaque=None):
+        
+        if attaque.name == "Vampiriser":
+            return self.Vampiriser(game)
         
 
     def degat_subit(self,monstre,degat):
@@ -251,8 +278,8 @@ class Guerrier_player(Unit):
 
     def vise_attaque(self,attaque_choisie,game):
         
-        if attaque_choisie == "Vampiriser":
-            return Attaque("Vampiriser", 15, self.x, self.y, image_viseur)
+        if attaque_choisie == "Frappe":
+            return Attaque("Frappe", 15, self.x, self.y, image_viseur, (0,0))
         elif attaque_choisie == "Intimidation" : 
             self.Intimidation(game)
         elif attaque_choisie == "Attaque de groupe" : 

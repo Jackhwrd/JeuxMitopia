@@ -4,13 +4,15 @@ from image import *
 
 
 class Attaque:
-    def __init__(self, name, r, x, y, shape, pen_walls = False):
+    def __init__(self, name, r, x, y, shape, blit_pos, pen_walls = False):
         self.name = name
         self.range = r         
         self.x = x
         self.y = y
         self.shape = shape
         self.walls = pen_walls
+        self.relative_img_pos_x =blit_pos[0]
+        self.relative_img_pos_y =blit_pos[1]
 
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
@@ -20,7 +22,7 @@ class Attaque:
 
 
     def draw(self,screen):
-        screen.blit(self.shape,(self.x*CELL_SIZE,self.y*CELL_SIZE)) 
+        screen.blit(self.shape,((self.x + self.relative_img_pos_x)*CELL_SIZE,(self.y + self.relative_img_pos_y)*CELL_SIZE)) 
 
 
 

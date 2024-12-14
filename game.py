@@ -187,11 +187,11 @@ class Game:
                     # Terminer le déplacement avec la touche Espace
                     if event.key == pygame.K_SPACE:
                         print("Attack Annulée.")
-                        running = False
                         return False
 
                     if event.key == pygame.K_RETURN:
-                        pass
+                        running = not selected_unit.execute_attaque(self, Attack)
+                        
 
 
                     # Calcul du déplacement
@@ -223,6 +223,10 @@ class Game:
 
                     # Déplacement valide : mettre à jour la position de l'unité
                     Attack.move(dx,dy)
+
+
+        print("attaque terminé")
+        return True
     
 
 
@@ -326,11 +330,27 @@ class Game:
     
     def is_occupied_by_unit(self, x, y):
         """Vérifie si une case est occupée par une unité."""
-        for unit in self.player_units + self.enemy_units:
+        if self.is_occupied_by_player(x,y) or self.is_occupied_by_enemy(x,y):
+            return True
+        return False
+    
+    def is_occupied_by_player(self, x, y):
+        for unit in self.player_units:
             if unit.x == x and unit.y == y:
                 return True
         return False
-
+    
+    def is_occupied_by_enemy(self, x, y):
+        for unit in self.enemy_units:
+            if unit.x == x and unit.y == y:
+                return True
+        return False
+    
+    def unit_at_position(self, x, y):
+        for unit in self.enemy_units + self.player_units:
+            if unit.x == x and unit.y == y:
+                return unit
+    
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
 
@@ -535,7 +555,7 @@ class Game:
         self.player_units = []
         for i, player_class in enumerate(self.player_class):
             if player_class == "Mage":
-                    self.player_units.append(Mage_player(i,0))
+                    self.player_units.append(Mage_player(30,6))
             elif player_class == "Vampire":
                     self.player_units.append(Vampire_player(i,0))
             elif player_class == "Guerrier":
@@ -543,7 +563,7 @@ class Game:
 
         self.enemy_units = [Vampire_enemy(6,6),
                             Mage_enemy(7,6),
-                            Guerrier_enemy(8,6),
+                            Guerrier_enemy(3,4),
                             Roi_enemy(37,21)]
         
         
