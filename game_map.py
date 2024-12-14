@@ -52,7 +52,12 @@ def mur():
           (x == GRID_SIZE_H - 3) & (y >= centre_y) & (y < centre_y + 4),
           (x == GRID_SIZE_H - 3) & (y > centre_y + 7),
           (x == GRID_SIZE_H - 4) & (y == centre_y + 3),
-          (x == GRID_SIZE_H - 4) & (y == centre_y + 8)),    #bon
+          (x == GRID_SIZE_H - 4) & (y == centre_y + 8),
+          (x >= GRID_SIZE_H - 7) & (x <= GRID_SIZE_H - 6) & (y == centre_y + 3),
+          (x >= GRID_SIZE_H - 7) & (x <= GRID_SIZE_H - 6) & (y == centre_y + 8),
+          (x >= GRID_SIZE_H - 11) & (x <= GRID_SIZE_H - 10) & (y == centre_y + 3),
+          (x >= GRID_SIZE_H - 11) & (x <= GRID_SIZE_H - 10) & (y == centre_y + 8),
+          (x >= centre_x + 4) & (x <= centre_x + 7) & (y == GRID_SIZE_V -2 )),    #bon
         
         # Salle 5
         ( (x >= centre_x - 1) & (x <= centre_x + 1) & (y == centre_y ), #bon
@@ -198,7 +203,7 @@ def teleport_unit(unit, target_pos, rooms, salles):
       #  def passages_secrets ():
 
 class GameObject:
-    def __init__(self, x, y, name, color, effect_color):
+    def __init__(self, x, y, name, color):
         """
         Initialise un objet à une position spécifique.
         - x, y: Position de l'objet en cellules.
@@ -210,7 +215,6 @@ class GameObject:
         self.y = y
         self.name = name
         self.color = color
-        self.effect_color = effect_color
         
     def draw(self, screen):
         """Dessine l'objet sur l'écran."""
@@ -225,9 +229,9 @@ def generate_objects():
     Crée une liste d'objets du jeu.
     """
     objets = [
-        GameObject(4, 4, 'Clef', GREEN, WHITE),  # Exemple : une épée
-        GameObject(centre_x - 2, centre_y - 2, 'Badge', BLUE, WHITE),  # badge
-        GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', LIGHT_YELLOW, BLACK)  #pass
+        GameObject(4, 4, 'Clef', GREEN),  # Exemple : une épée
+        GameObject(centre_x - 2, centre_y - 2, 'Badge', GREEN),  # badge
+        GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', GREEN)  #pass
     ]
     return objets
 
@@ -281,12 +285,61 @@ class salle :
         self.ouverte = True
         return True
 
+class CaseRegeneration:
+    def __init__(self, x, y, color):
+        """Initialise la case de régénération à une position donnée"""
+        self.x = x
+        self.y = y
+        self.color = color
+
+    def appliquer_effet(self, unité, game):
+        """
+        Applique l'effet de régénération lorsqu'une unité se trouve sur cette case.
+        unité : instance de l'unité qui se trouve sur la case
+        game : instance du jeu contenant les unités
+        """
+        # Régénération pour l'unité qui se trouve sur la case
+        regen = unité.health_max * 0.2  # Par exemple, régénérer 20% de la santé max
+        unité.health = min(unité.health + regen, unité.health_max)  # Ne pas dépasser la santé max
+
+        # Drain de vie des ennemis adjacents
+        for enemy in game.enemy_units:
+            distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
+            if 1 <= distance <= 1:  # Pour les ennemis autour de la case
+                degat = unité.puissance_attaque * unité.stat_attaque
+                degat_final = enemy.degat_subit(unité, degat)
+                enemy.update_health(degat_final)
+                unité.health = min(unité.health + degat_final / 2, unité.health_max)
+                if not enemy.en_vie:
+                    game.enemy_units.remove(enemy)
+                break  # On affecte un seul ennemi à la fois
+        """
+        # (Optionnel) Donner de la santé à une unité alliée proche
+        for ami in game.player_units:
+            distance = abs(self.x - ami.x) + abs(self.y - ami.y)
+            if 1 <= distance <= 1 and ami != unité:
+                soin = unité.health * 0.1  # Donne 10% de la santé actuelle de l'unité active
+                ami.health = min(ami.health + soin, ami.health_max)
+                unité.health -= soin
+                """
+    def draw(self, screen):
+        rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        pygame.draw.rect(screen, self.color, rect)
+    
+def generate_cases():
+    
+    cases_regeneration = [
+        CaseRegeneration (centre_x + 2, GRID_SIZE_V - 3, LIGHT_YELLOW),
+        CaseRegeneration (centre_x + 2, GRID_SIZE_V - 4, LIGHT_YELLOW)
+        ]
+    return cases_regeneration
+
 # Création d'un objet GameObject
-clef = GameObject(4, 4, 'Clef', GREEN, WHITE)
-badge = GameObject(centre_x, centre_y, 'Badge', BLUE, WHITE)
-pierre = GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', LIGHT_YELLOW, BLACK)  #pass
+clef = GameObject(4, 4, 'Clef', GREEN)
+badge = GameObject(centre_x, centre_y, 'Badge', GREEN)
+pierre = GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', GREEN)  #pass
 
-
+# Création des salles
 cave = salle(1, KAKI, False, 3, objet=clef)
 sellier = salle(2, (0, 255, 0), False, 3, objet=pierre, conditions={"Badge": True})
 cuisines = salle(3, WHITE, False, 3, conditions={"Pierre de téléportation": True})
@@ -294,6 +347,12 @@ ecuries = salle(4, YELLOW, False, 3)
 arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
 
 salles = [cave, sellier, cuisines, ecuries, arene]
+
+# Création des cases de régénération
+case1 = CaseRegeneration (GRID_SIZE_H - 4, GRID_SIZE_V - 3, LIGHT_YELLOW)
+case2 = CaseRegeneration (centre_x + 2, GRID_SIZE_V - 2, LIGHT_YELLOW)
+
+cases_regeneration = [case1, case2]
 
 for salle in salles:
     salle.afficher_infos()

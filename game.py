@@ -11,19 +11,6 @@ rooms = generate_rooms(salles)
 
 
 class Game:
-    """
-    Classe pour représenter le jeu.
-
-    ...
-    Attributs
-    ---------
-    screen: pygame.Surface
-        La surface de la fenêtre du jeu.
-    player_units : list[Unit]
-        La liste des unités du joueur.
-    enemy_units : list[Unit]
-        La liste des unités de l'adversaire.
-    """
     
 
     def __init__(self, screen, player_count,player_classe):
@@ -38,6 +25,7 @@ class Game:
         self.salles = salles
         self.rooms = generate_rooms(salles)
         self.objects = generate_objects()
+        self.cases_reg = generate_cases()
 
         self.player_units = []
         for i, player_class in enumerate(player_classe):
@@ -391,9 +379,9 @@ class Game:
             unit.draw(self.screen)
             unit.update_health_bar(self.screen)
 
-        # Affiche les objets
-        for obj in self.objects:
-            obj.draw(self.screen)
+        # Affiche les cases de régénération
+        for cas in self.cases_reg:
+            cas.draw(self.screen)
         
         # Afficher les attaques si nécessaire
         if attacking:

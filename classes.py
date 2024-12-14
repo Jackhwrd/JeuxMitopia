@@ -39,7 +39,7 @@ class Mage_player(Unit):
                     game.enemy_units.remove(enemy)
                 break 
 
-        for ami in game.player_unit:
+        for ami in game.player_units:
 
             vie = self.health * 0.15 # pour prendre 15% de la vie restante lors du tour 
             distance = abs(self.x - ami.x) + abs(self.y - ami.y)
@@ -48,7 +48,6 @@ class Mage_player(Unit):
                 
                 ami.health += vie 
                 self.health -= vie 
-    
 
     def Bouclier(self,game): 
         """attaque qui permet d'augmenter sa stat de defense ainsi que ces amie dans un rayon de 1 bloque mais qui baisse un peu son attaque """

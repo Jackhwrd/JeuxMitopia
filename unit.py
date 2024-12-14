@@ -84,6 +84,12 @@ class Unit:
 
         pass 
 
+    def update_health(self, degat):
+        """Met à jour la santé de l'unité après avoir subi des dégâts."""
+        self.health -= degat
+        if self.health <= 0:
+            self.en_vie = False
+
     def update_health_bar(self, surface):
         
         # Position et dimensions pour que ce soit juste en dessous du perso
