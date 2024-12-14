@@ -74,9 +74,10 @@ pygame.draw.polygon(blood_surface, VAMPIRE, triangle_points) #ajout les deux ens
 
 
 zone_vampiriser = pygame.Surface((CELL_SIZE*5, CELL_SIZE*5), pygame.SRCALPHA)
-
-# Draw a rectangle on the surface
 pygame.draw.rect(zone_vampiriser, VAMPIRE, (0, 0, CELL_SIZE*5, CELL_SIZE*5), width = 2)
+
+image_selectionner_allié = pygame.Surface((CELL_SIZE, CELL_SIZE), pygame.SRCALPHA)
+pygame.draw.rect(image_selectionner_allié, GREEN, (0, 0, CELL_SIZE, CELL_SIZE), width = 3)
 
 
 

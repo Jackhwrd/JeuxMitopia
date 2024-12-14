@@ -79,7 +79,7 @@ class Game:
 
                 # Tant que l'unité n'a pas terminé son tour
                 has_acted = False
-                selected_unit.is_selected = True
+#                selected_unit.is_selected = True
                 selecting_attack = False  # Flag pour savoir si on est dans le menu d'attaque
                 current_option = 0  # Option actuelle
                 selected_attack = 0  # Attaque actuellement sélectionnée
@@ -134,7 +134,7 @@ class Game:
                                 if event.key == pygame.K_RETURN:
                                 
                                     has_acted = self.gestion_attaque(selected_unit,selected_attack)
-                                    selected_unit.is_selected = not has_acted
+#                                    selected_unit.is_selected = not has_acted
                                     selecting_attack = has_acted
                                     self.flip_display()
 
@@ -168,7 +168,7 @@ class Game:
             selected_unit.vise_attaque(selected_unit.liste_attaque[1],self)
             return True
         elif selected_attack == 2 : 
-            selected_unit.vise_attaque(selected_unit.liste_attaque[2], self)
+            selected_unit.vise_attaque(selected_unit.liste_attaque[2],self)
             return True
         
         running = True # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
@@ -190,8 +190,10 @@ class Game:
                         return False
 
                     if event.key == pygame.K_RETURN:
-                        running = not selected_unit.execute_attaque(self, Attack)
-                        
+                        Attack = selected_unit.execute_attaque(self, Attack)
+                        if Attack == None:
+                            running = False
+                            continue 
 
 
                     # Calcul du déplacement
@@ -555,7 +557,7 @@ class Game:
         self.player_units = []
         for i, player_class in enumerate(self.player_class):
             if player_class == "Mage":
-                    self.player_units.append(Mage_player(30,6))
+                    self.player_units.append(Mage_player(i,0))
             elif player_class == "Vampire":
                     self.player_units.append(Vampire_player(i,0))
             elif player_class == "Guerrier":

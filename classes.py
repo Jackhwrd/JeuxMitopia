@@ -18,15 +18,15 @@ class Mage_player(Unit):
             degat = self.puissance_attaque * self.stat_attaque*0.85
             degat_final = enemy.degat_subit(self, degat)
             enemy.update_health(degat_final)
-            print(f"Enemy {enemy.type} est frappée et reçoit {degat_final} points de dégats")
+            print(f"Enemie {enemy.type} est frappée et reçoit {degat_final} points de dégats")
             if not enemy.en_vie:
                 game.enemy_units.remove(enemy)
-                print(f"Enemy {enemy.type} est mort!")
+                print(f"Enemie {enemy.type} est mort!")
         else:
-            print("Il faut selectionner un enemy!")
-            return False
+            print("Il faut selectionner un enemie!")
+            return attaque
         
-        return True
+        return None
 
     def Regene(self,game):
         """attaque qui permet de se regenerer avec la vie d'un ennemie ou de donner de la vie à un joueur"""
@@ -147,7 +147,7 @@ class Vampire_player(Unit):
         else:
             print(f"Batorie a completement raté son attaque???")
 
-        return True
+        return None
     
     def Furtif(self,game) : 
         "Tape un adversaire qui se trouve dans un rayon de 4 Block "
@@ -220,7 +220,7 @@ class Vampire_player(Unit):
 class Guerrier_player(Unit):
     def __init__(self, x, y):
         super().__init__(x, y, 25, 'player', image_guts, 0.3,1, 12)
-        self.liste_attaque = ["Frappe", "Intimidation", "Attaque de groupe"]
+        self.liste_attaque = ["Lancer", "Intimidation", "Frappe"]
         self.type = "Guerrier"
 
     def Frappe(self,game): 
@@ -254,18 +254,41 @@ class Guerrier_player(Unit):
 
 
 
-    def Attaque_de_groupe(self,game) : 
-        "frappe tout les enemie dans un rayon de 2 block mais avec un peu moins de force"
+    def Lancer(self,game,attaque): 
+        "Lance un joueur ou un enemy ine certaine distance"
+        if game.is_wall(attaque.x,attaque.y):
+            print("Destination impossible")
+            return attaque
+        for unit in game.enemy_units + game.player_units:
+            if unit.is_selected:
+                unit.x, unit.y = attaque.x, attaque.y
+                if unit.team == "enemy":
+                    degat = self.puissance_attaque * self.stat_attaque * 2 if is_near_wall(attaque.x, attaque.y) else self.puissance_attaque * self.stat_attaque * 0.85 
+                    degat_final = unit.degat_subit(self, degat)
+                    unit.update_health(degat_final)
+                print(f"l'alliée {unit.type} est propulsé vers case sélectionné") if unit.team == "player" else print(f"l'enemie {unit.type} percute le mur et reçoit {degat_final}!") if is_near_wall(attaque.x, attaque.y) else print(f"l'enemie s'envole et reçoit {degat_final}")
+                if not unit.en_vie:
+                        game.enemy_units.remove(unit)
+                        print(f"l'enemie {unit.type} est mort!")
+        return None
 
-        for enemy in game.enemy_units: 
-            distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
-            if 0 <= distance <3:  
 
-                degat = self.puissance_attaque * self.stat_attaque * 0.85
-                degat_final = enemy.degat_subit(self, degat)
-                enemy.update_health(degat_final)
-                if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+
+    def __Grab(self,game,attaque):
+        x, y = attaque.x, attaque.y
+        if game.is_occupied_by_unit(x, y):
+            unit = game.unit_at_position(x, y)
+            unit.is_selected = True
+            print(f"vous attrapez {unit.team} {unit.type} et vous vous préparez au lancé")
+            return Attaque("Lancer", 8, self.x, self.y, image_viseur, (0,0), True)
+        else:
+            print("Il vaut attraper un unit")
+            return attaque
+
+
+
+    
+
                     
 # def attaque(self, attaque_choisie, game):
 
@@ -279,11 +302,18 @@ class Guerrier_player(Unit):
     def vise_attaque(self,attaque_choisie,game):
         
         if attaque_choisie == "Frappe":
-            return Attaque("Frappe", 15, self.x, self.y, image_viseur, (0,0))
+            self.Frappe(game)
         elif attaque_choisie == "Intimidation" : 
             self.Intimidation(game)
-        elif attaque_choisie == "Attaque de groupe" : 
-            self.Attaque_de_groupe(game)
+        elif attaque_choisie == "Lancer" : 
+            return Attaque("Grab", 1, self.x, self.y, image_selectionner_allié, (0,0))
+
+    def execute_attaque(self,game,attaque=None):
+        
+        if attaque.name == "Grab":
+            return self.__Grab(game,attaque)
+        if attaque.name == "Lancer":
+            return self.Lancer(game, attaque)
         
 
     def degat_subit(self,monstre,degat):
