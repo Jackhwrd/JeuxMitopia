@@ -27,7 +27,7 @@ class Mage_player(Unit):
     def Regene(self,game):
         """attaque qui permet de se regenerer avec la vie d'un ennemie ou de donner de la vie à un joueur"""
 
-        for enemy in game.enemy_units: #pour prendre la vie d'un montre 
+        for enemy in game.enemy_units: #pour prendre la vie d'un monstre 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
             if 0 <= distance < 2:  # pour les 8 cases autour du joueur 
 
@@ -94,6 +94,15 @@ class Mage_player(Unit):
         elif attaque_choisie == "Bouclier" : 
             self.Bouclier(game)
 
+    def vise_attaque(self,attaque_choisie,game):
+        
+        if attaque_choisie == "Longue attaque":
+            return Attaque("Longue attaque", 15, self.x, self.y, image_viseur)
+        elif attaque_choisie == "Régène" : 
+            self.Regene(game)
+        elif attaque_choisie == "Bouclier" : 
+            self.Bouclier(game)
+
 class Vampire_player(Unit):
 
     
@@ -150,7 +159,7 @@ class Vampire_player(Unit):
                 
                 self.stat_attaque += 0.1
 
-    def attaque(self,attaque_choisie,game):
+    def execute_attaque(self,attaque_choisie,game):
         
         if attaque_choisie == "Vampiriser":
             self.Vampiriser(game)
@@ -158,6 +167,15 @@ class Vampire_player(Unit):
             self.Furtif(game)
         elif attaque_choisie == "Brouiller" : 
             self.Brouiller(game)
+
+ #   def vise_attaque(self,attaque_choisie,game):
+ #       if attaque_choisie == "Vampiriser":
+ #           self.Vampiriser(game)
+ #       elif attaque_choisie == "Furtif" : 
+ #           self.Furtif(game)
+ #       elif attaque_choisie == "Brouiller" : 
+ #           self.Brouiller(game)
+        
 
     def degat_subit(self,monstre,degat):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """

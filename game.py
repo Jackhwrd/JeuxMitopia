@@ -38,14 +38,6 @@ class Game:
 
         self.player_units = []
         self.enemy_units = []
-
-        # Prépare les rectangles pour les cellules de la grille
-        self.grid_rects = [
-            pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            for x in range(0, WIDTH, CELL_SIZE)
-            for y in range(0, HEIGHT, CELL_SIZE)
-        ]
-
         self.screen = screen
         self.walls = mur()
         self.rooms = generate_rooms(salles)
@@ -122,7 +114,7 @@ class Game:
                                 # Si l'option "Attaquer" est sélectionnée
                                 if event.key == pygame.K_RETURN and current_option == 1:
                                     selecting_attack = True  # On passe dans le menu d'attaque
-                                    self.flip_display(attacking=False, Attack=None)
+                                    self.flip_display()
 
                                 # Si l'option "Avancer" est sélectionnée, on déplace l'unité
                                 if event.key == pygame.K_RETURN and current_option == 0:
@@ -140,17 +132,11 @@ class Game:
 
                                 # Si l'attaque est confirmée
                                 if event.key == pygame.K_RETURN:
-                                    
-                                    if selected_attack == 0:  
-                                        
-                                        selected_unit.attaque(selected_unit.liste_attaque[0],self)
-                                    elif selected_attack == 1:  
-                                        selected_unit.attaque(selected_unit.liste_attaque[1],self)
-                                    elif selected_attack == 2 : 
-                                        selected_unit.attaque(selected_unit.liste_attaque[0],self)
-
-                                    has_acted = True
-                                    selected_unit.is_selected = False
+                                
+                                    has_acted = self.gestion_attaque(selected_unit,selected_attack)
+                                    selected_unit.is_selected = not has_acted
+                                    selecting_attack = has_acted
+                                    self.flip_display()
 
                     # Affichage des options principales (Avancer ou Attaquer)
                     if not selecting_attack:
@@ -174,7 +160,70 @@ class Game:
 
          
 
+    def gestion_attaque(self, selected_unit,selected_attack):
+
+        if selected_attack == 0:  
+            Attack = selected_unit.vise_attaque(selected_unit.liste_attaque[0],self)
+        elif selected_attack == 1:  
+            selected_unit.attaque(selected_unit.liste_attaque[1],self)
+            return True
+        elif selected_attack == 2 : 
+            selected_unit.attaque(selected_unit.liste_attaque[2],self)
+            return True
         
+        running = True # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
+        starting_x,starting_y = selected_unit.x,selected_unit.y
+
+            # Stocker les coordonnées initiales de l'unité pour calculer la distance parcourue
+        while running:
+            self.flip_display(None, Attaque = Attack)  # Mettre à jour l'affichage
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                if event.type == pygame.KEYDOWN:
+                    # Terminer le déplacement avec la touche Espace
+                    if event.key == pygame.K_SPACE:
+                        print("Attack Annulée.")
+                        running = False
+                        return False
+
+                    if event.key == pygame.K_RETURN:
+                        pass
+
+
+                    # Calcul du déplacement
+                    dx, dy = 0, 0
+                    if event.key == pygame.K_LEFT:
+                        dx = -1
+                    elif event.key == pygame.K_RIGHT:
+                        dx = 1
+                    elif event.key == pygame.K_UP:
+                        dy = -1
+                    elif event.key == pygame.K_DOWN:
+                        dy = 1
+
+                    # Calcul des nouvelles coordonnées
+                    new_x = Attack.x + dx
+                    new_y = Attack.y + dy
+
+                    # Vérification des limites de déplacement
+                    distance = abs(new_x - starting_x) + abs(new_y - starting_y)
+                    if distance > Attack.range:
+                        print("Déplacement trop loin ! Mouvement annulé.")
+                        continue
+
+                    # Vérifier les collisions avec les murs
+
+                    if self.is_wall(new_x, new_y) and not Attack.walls:
+                        print("Collision avec un mur ! Mouvement annulé.")
+                        continue
+
+                    # Déplacement valide : mettre à jour la position de l'unité
+                    Attack.move(dx,dy)
+    
 
 
     
@@ -184,10 +233,7 @@ class Game:
         Rlist = self.bfs_reachable(selected_unit) # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
         print(Rlist)
 
-
         # Stocker les coordonnées initiales de l'unité pour calculer la distance parcourue
-        start_x, start_y = selected_unit.x, selected_unit.y
-
         while running:
             self.flip_display(Rlist)  # Mettre à jour l'affichage
 
@@ -324,7 +370,7 @@ class Game:
             
 
 
-    def flip_display(self, Rlist=None):
+    def flip_display(self, Rlist=None, Attaque= None):
         """Affiche le jeu."""
 
         # Effacer l'écran (en dehors de la boucle principale pour éviter les flashs)
@@ -366,6 +412,9 @@ class Game:
                 rect_x = x * CELL_SIZE
                 rect_y = y * CELL_SIZE
                 pygame.draw.rect(self.screen, YELLOW, (rect_x, rect_y, CELL_SIZE, CELL_SIZE), 1)
+
+        if Attaque != None:
+            Attaque.draw(self.screen)
 
         pygame.display.flip()
 
