@@ -30,7 +30,6 @@ class Mage_player(Unit):
 
     def Regene(self,game):
         """attaque qui permet de se regenerer avec la vie d'un ennemie ou de donner de la vie à un joueur"""
-        print("dans attaque regene")
         for enemy in game.enemy_units: #pour prendre la vie d'un monstre 
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
             if 0 <= distance < 2:  # pour les 8 cases autour du joueur 
@@ -263,10 +262,10 @@ class Guerrier_player(Unit):
             if unit.is_selected:
                 unit.x, unit.y = attaque.x, attaque.y
                 if unit.team == "enemy":
-                    degat = self.puissance_attaque * self.stat_attaque * 2 if is_near_wall(attaque.x, attaque.y) else self.puissance_attaque * self.stat_attaque * 0.85 
+                    degat = self.puissance_attaque * self.stat_attaque * 2 if is_near_wall(attaque.x, attaque.y, game.walls) else self.puissance_attaque * self.stat_attaque * 0.85 
                     degat_final = unit.degat_subit(self, degat)
                     unit.update_health(degat_final)
-                print(f"l'alliée {unit.type} est propulsé vers case sélectionné") if unit.team == "player" else print(f"l'enemie {unit.type} percute le mur et reçoit {degat_final}!") if is_near_wall(attaque.x, attaque.y) else print(f"l'enemie s'envole et reçoit {degat_final}")
+                print(f"l'alliée {unit.type} est propulsé vers case sélectionné") if unit.team == "player" else print(f"l'enemie {unit.type} percute le mur et reçoit {degat_final}!") if is_near_wall(attaque.x, attaque.y,game.walls) else print(f"l'enemie s'envole et reçoit {degat_final}")
                 if not unit.en_vie:
                         game.enemy_units.remove(unit)
                         print(f"l'enemie {unit.type} est mort!")
