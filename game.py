@@ -176,6 +176,8 @@ class Game:
         return best_move
     
 
+ 
+ 
     def handle_player_turn(self):
         """Tour du joueur"""
         for rang_joueur, selected_unit in enumerate (self.player_units):

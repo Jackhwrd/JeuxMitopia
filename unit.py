@@ -122,11 +122,11 @@ class Unit:
         self.niveau += 1
         print(f"Votre niveau a augmenté : {self.niveau}")
 
-    def collect(self, obj):
+#    def collect(self, obj):
         # Si l'objet n'est pas déjà dans la liste, on l'ajoute
-        if obj.name not in [o.name for o in self.has_object]:
-            self.has_object.append(obj)
-            print(f"Vous avez ramassé : {obj.name}!")
+#        if obj.name not in [o.name for o in self.has_object]:
+#            self.has_object.append(obj)
+#            print(f"Vous avez ramassé : {obj.name}!")
             
     def update_health(self,degat) : 
         if self.health - degat > degat : #Le joueur à assez de vie pour subir le degat

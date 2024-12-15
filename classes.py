@@ -85,7 +85,7 @@ class Mage_player(Unit):
         else : 
             degat_final = degat
         
-        return degat_final-(degat*self.stat_defense)
+        return degat_final-(degat_final*self.stat_defense)
     
 #    def attaque(self,attaque_choisie,game):
 #        
@@ -214,7 +214,7 @@ class Vampire_player(Unit):
         else :
             degat_final = degat
             
-        return degat_final-(degat*self.stat_defense)
+        return degat_final-(degat_final*self.stat_defense)
 
 class Guerrier_player(Unit):
     def __init__(self, x, y):
@@ -402,7 +402,7 @@ class Vampire_enemy(Unit):
         elif monstre.type == "Guerrier": 
             degat_final = degat / 2
             
-        return degat_final-(degat*self.stat_defense)
+        return degat_final-(degat_final*self.stat_defense)
     
 
 class Guerrier_enemy(Unit):
@@ -475,7 +475,7 @@ class Guerrier_enemy(Unit):
         elif monstre.type == "Guerrier": 
             degat_final = degat 
             
-        return degat_final-(degat*self.stat_defense)
+        return degat_final-(degat_final*self.stat_defense)
     
 class Mage_enemy(Unit):
     def __init__(self, x, y):
@@ -492,7 +492,7 @@ class Mage_enemy(Unit):
         elif monstre.type == "Guerrier": 
             degat_final = degat * 2
         
-        return degat_final-(degat*self.stat_defense)
+        return degat_final-(degat_final*self.stat_defense)
     
     def Longue_attaque(self, game):
         """Attaque à distance sur les ennemis qui sont dans une zone d'attaque de 4 à 6 carreaux."""
@@ -617,7 +617,7 @@ class Status_enemy(Unit):
         else : 
             degat_final = degat 
         
-        return degat_final-(degat*self.stat_defense)
+        return degat_final-(degat_final*self.stat_defense)
     
     def attaque(self,attaque_choisie,game):
         
@@ -674,7 +674,7 @@ class Roi_enemy(Unit):
         else : 
             degat_final = degat 
         
-        return degat_final-(degat*self.stat_defense)
+        return degat_final-(degat_final*self.stat_defense)
     
     def attaque(self,attaque_choisie,game):
         
