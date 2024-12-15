@@ -305,7 +305,7 @@ class CaseRegeneration:
         game : instance du jeu contenant les unités
         """
         # Régénération pour l'unité qui se trouve sur la case
-        regen = unit.max_health * 0.2  # Par exemple, régénérer 20% de la santé max
+        regen = unit.max_health * 0.1  # Par exemple, régénérer 20% de la santé max
         unit.health = min(unit.health + regen, unit.max_health)  # Ne pas dépasser la santé max
         print(f'{unit.health}')
 
