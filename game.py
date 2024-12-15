@@ -154,21 +154,25 @@ class Game:
         target_x, target_y = target_unit.x, target_unit.y
 
         # Initialiser le meilleur mouvement et sa distance
-        best_move = None
+        best_move = (0,0)
         min_distance = float('inf')
+        print(min_distance)
 
+ 
         # Explorer toutes les directions pour trouver la case adjacente la plus proche de la cible
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
+            print(nx,ny)
 
             # Vérifier si la nouvelle position est dans les limites et n'est pas un mur
             if 0 <= nx < WIDTH and 0 <= ny < HEIGHT and not self.is_wall(nx, ny) and not self.is_occupied_by_unit(nx,ny):
                     # Vérifier si la position actuelle est plus proche de la cible que le meilleur mouvement précédent
                 target_distance = abs(target_x - nx) + abs(target_y - ny)  # Distance de Manhattan à la cible
+                print(target_distance)
                 if target_distance < min_distance:
                     min_distance = target_distance
                     best_move = (dx, dy)
-
+        print(best_move)
         return best_move
     
 
@@ -338,7 +342,7 @@ class Game:
         """Permet à une unité de se déplacer plusieurs fois jusqu'à ce que l'utilisateur décide d'arrêter avec Espace."""
         running = True
         Rlist = self.bfs_reachable(selected_unit) # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
-        print(Rlist)
+         
 
         # Stocker les coordonnées initiales de l'unité pour calculer la distance parcourue
         while running:
