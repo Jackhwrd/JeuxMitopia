@@ -32,7 +32,6 @@ class Game:
         Initialise le jeu avec les paramètres nécessaires.
         """
         self.In_Game = False
-        self.screen = screen
         self.enemy_images = [image_mechant_guerier, image_mechant_vampire, image_mechant_mage]
         self.player_class = player_classe # liste des classes des joueurs 
 
@@ -59,8 +58,6 @@ class Game:
                 if dist > selected_unit.vitesse:  
                     continue
 
-                print(x,y,dist)
-
                 reachable.append((x, y))
 
             # Explore toute les directions
@@ -73,30 +70,23 @@ class Game:
               
 
     def distance_to_all_units(self, selected_unit):
-        print("calcul de distance")
         distances = {}  # Dictionnaire pour stocker les distances de toutes les unités
         visited = np.zeros((HEIGHT, WIDTH))  # Cases visitées
         queue = deque([(selected_unit.x, selected_unit.y, 0)])  # Point de départ (x, y, distance)
         visited[selected_unit.y, selected_unit.x] = True
         player_units = []
         k = 0
-        for unit in self.player_units:
-            print(unit.x, unit.y)
 
         # Directions pour se déplacer sur la grille (haut, bas, gauche, droite)
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # 4 directions
         searching = True
         while searching:
             x, y, dist = queue.popleft()
-            print(x,y,dist)
 
             # Ajouter la position de l'unité et sa distance au dictionnaire 
             if self.is_occupied_by_player(x, y):
                 distances[(x, y)] = dist
-                print("unité découverte")
-                print(x,y)
                 player_units.append(self.unit_at_position(x,y))
-                print(player_units)
                 if len(player_units) == len(self.player_units):
                     searching = False
                     continue
@@ -109,8 +99,6 @@ class Game:
                     visited[ny, nx] = True
                     queue.append((nx, ny, dist + 1))
             k += 1
-        print(k)
-        print(distances)
         return distances
 
     def calculate_preference_weight(self, selected_unit, target_unit):
@@ -127,7 +115,6 @@ class Game:
             return 0.5  # Paires les moins préférées (vert vs bleu, rouge vs vert, etc.)
 
     def select_target_unit(self, selected_unit):
-        print("sélection de cible")
         distances = self.distance_to_all_units(selected_unit)
 
         # Extraire les unités et leurs distances
@@ -137,26 +124,21 @@ class Game:
         # Inverser les distances (les unités plus proches doivent avoir un poids plus élevé)
         max_distance = max(dist_values) if dist_values else 1
         weights = [max_distance + 1 - dist for dist in dist_values]  # Inverser les distances pour la probabilité
-        print(weights)
 
         # Calculer les poids de préférence en fonction du type d'unité
         preference_weights = [
             self.calculate_preference_weight(selected_unit, self.unit_at_position(unit[0],unit[1])) for unit in units
         ]
-        print(preference_weights)
 
         # Poids finaux : combiner les poids de distance et les poids de préférence
         final_weights = [weights[i] * preference_weights[i] for i in range(len(weights))]
-        print(final_weights)
 
         # Normaliser les poids finaux pour que leur somme soit égale à 1
         total_weight = sum(final_weights)
         normalized_weights = [w / total_weight for w in final_weights]
-        print(normalized_weights)
 
         # Sélectionner une unité cible en fonction des poids calculés
         target_unit = random.choices(units, weights=normalized_weights, k=1)[0]
-        print(target_unit)
         return target_unit
     
 
@@ -535,7 +517,7 @@ class Game:
                 pygame.draw.rect(self.screen, BLACK, rect, 1)
 
         # Affiche les unités
-        for unit in self.player_units + self.enemy_units :
+        for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
             unit.update_health_bar(self.screen)
         
@@ -687,10 +669,6 @@ class Game:
                             Guerrier_enemy(3,4),
                             Roi_enemy(37,21)]
         
-        
-        
-
-
     def En_jeu(self) : 
         self.debut_jeu()
         self.In_Game = True

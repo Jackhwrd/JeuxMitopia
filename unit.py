@@ -1,6 +1,7 @@
 import pygame
 import random
 from image import *
+from abc import ABC, abstractmethod
 
 
 class Attaque:
@@ -154,3 +155,7 @@ class Unit:
         # Dessiner la barre de vie (proportionnelle à la santé restante)
         health_width = (self.health / self.max_health) * bar_width
         pygame.draw.rect(surface, health_color, [bar_x, bar_y, health_width, bar_height])
+
+    @abstractmethod
+    def degat_subit(self):
+        pass
