@@ -60,6 +60,9 @@ class Unit:
         self.niveau = niveau  # Niveau du joueur
         self.max_health = 100
         self.en_vie = True 
+        self.wall_damage = False
+        self.attaque = None
+
         
         
     def move(self, dx, dy):
@@ -70,13 +73,18 @@ class Unit:
 
     def attack(self, target):
         """Attaque une unité cible."""
+        self.wall_damage = False
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
-            target.health -= self.attack_power
+            target.health -= self.puissance_attaque
+        if target.puissance_attaque >= ATTAQUE_DESTRUCTRICE :
+            self.wall_damage = True
+
 
     def update_attack(self, impact):
         """Met à jour la santé de l'unité après avoir subi des dégâts."""
         self.puissance_attaque -= impact
                 
+    
     
     def draw(self, screen):
         if self.character_image:

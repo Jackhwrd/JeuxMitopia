@@ -3,15 +3,19 @@ import random
 from image import *
 from unit import *  
 from game import *
+from game_map import *
 
 class Mage_player(Unit):
     def __init__(self, x, y):
         super().__init__(x, y, 14, 'player', image_croque_minou, 0.8,1,6)
         self.liste_attaque = ["Longue attaque", "Régène", "Bouclier"]
         self.type = "Mage"
+        self.x = x
+        self.y = y
 
     def Longue_attaque(self, game, attaque):
         """Attaque à distance sur les ennemis qui sont dans une zone d'attaque de 4 à 6 carreaux avec un peu moins de puissance"""
+        print(f'attaque longue')
         x, y = attaque.x, attaque.y
         if game.is_occupied_by_enemy(x, y):
             enemy = game.unit_at_position(x, y)
@@ -22,11 +26,21 @@ class Mage_player(Unit):
             if not enemy.en_vie:
                 game.enemy_units.remove(enemy)
                 print(f"Enemie {enemy.type} est mort!")
+            # Sinon, vérifiez si la case ciblée est un mur
+        elif game.is_near_wall_at(x, y):
+            if self.puissance_attaque >= ATTAQUE_DESTRUCTRICE:  # Vérification de la puissance
+                # Trouver et détruire le mur
+                for wall in game.walls:
+                    if wall.contains(x, y):  # Vérifie si ce mur inclut la case ciblée
+                        game.walls.remove(wall)
+                        print(f"Le mur à ({x}, {y}) a été détruit !")
+                        break
+            else:
+                print("L'attaque n'est pas assez puissante pour détruire le mur !")
         else:
-            print("Il faut selectionner un enemie!")
-            return attaque
-        
-        return None
+            print("Il faut sélectionner un ennemi ou un mur !")
+        return attaque
+
 
     def Regene(self,game):
         """attaque qui permet de se regenerer avec la vie d'un ennemie ou de donner de la vie à un joueur"""
@@ -98,6 +112,7 @@ class Mage_player(Unit):
     def vise_attaque(self,attaque_choisie,game):
         
         if attaque_choisie == "Longue attaque":
+            print("Choisissez une cible pour la longue attaque.")
             return Attaque("Longue attaque", 15, self.x, self.y, image_viseur, (0,0))
         elif attaque_choisie == "Régène" : 
             self.Regene(game)
@@ -106,7 +121,8 @@ class Mage_player(Unit):
 
     def execute_attaque(self,game,attaque=None):
         
-        if attaque.name == "Longue attaque":
+        if attaque == "Longue attaque":
+            print(f'éxécution de {attaque}')
             return self.Longue_attaque(game,attaque)
 
 class Vampire_player(Unit):
@@ -249,8 +265,6 @@ class Guerrier_player(Unit):
                 enemy.stat_attaque -= 0.1  
                 
                 self.stat_attaque += 0.1
-
-
 
     def Lancer(self,game,attaque): 
         "Lance un joueur ou un enemy ine certaine distance"

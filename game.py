@@ -31,26 +31,6 @@ class Game:
         self.traps = generate_traps()
 
 
-        self.player_units = []
-        for i, player_class in enumerate(player_classe):
-            if player_class == "Mage":
-                    self.player_units.append(Mage_player(i,0))
-            elif player_class == "Vampire":
-                    self.player_units.append(Vampire_player(i,0))
-            elif player_class == "Guerrier":
-                    self.player_units.append(Guerrier_player(i,0))
-
-
-        self.enemy_units = [Vampire_enemy(6,6),
-                            Vampire_enemy(7,6),
-                            Vampire_enemy(8,6)]
-
-        # Prépare les rectangles pour les cellules de la grille
-        self.grid_rects = [
-            pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            for x in range(0, WIDTH, CELL_SIZE)
-            for y in range(0, HEIGHT, CELL_SIZE)
-        ]
     def bfs_reachable(self, selected_unit):
             visited = np.zeros((HEIGHT,WIDTH))
             queue = deque([(selected_unit.x, selected_unit.y, 0)])  
@@ -76,13 +56,9 @@ class Game:
                     if 0 <= nx < WIDTH and 0 <= ny < HEIGHT and not visited[ny, nx] and not self.is_wall(nx,ny) and not self.is_occupied_by_unit(nx,ny):
                         visited[ny, nx] = True
                         queue.append((nx, ny, dist + 1))
+    
             return reachable   
-<<<<<<< HEAD
         
-                
-=======
-              
-
     def distance_to_all_units(self, selected_unit):
         print("calcul de distance")
         distances = {}  # Dictionnaire pour stocker les distances de toutes les unités
@@ -199,16 +175,14 @@ class Game:
                     best_move = (dx, dy)
 
         return best_move
-    
-
->>>>>>> 95453ff93c46e225d3294371e1041b60b28a8f2e
+                
     def handle_player_turn(self):
         """Tour du joueur"""
         for rang_joueur, selected_unit in enumerate (self.player_units):
 
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
-            selected_unit.is_selected = True
+            #selected_unit.is_selected = True
             selecting_attack = False  # Flag pour savoir si on est dans le menu d'attaque
             current_option = 0  # Option actuelle
             selected_attack = 0  # Attaque actuellement sélectionnée
@@ -223,25 +197,12 @@ class Game:
                 self.screen.blit(texte, text_rect.topleft)
                 
 
-<<<<<<< HEAD
                 # Boucle principale d'événements
                 for event in pygame.event.get():
                     # Gestion de la fermeture de la fenêtre
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         exit()
-=======
-                # Tant que l'unité n'a pas terminé son tour
-                has_acted = False
-#                selected_unit.is_selected = True
-                selecting_attack = False  # Flag pour savoir si on est dans le menu d'attaque
-                current_option = 0  # Option actuelle
-                selected_attack = 0  # Attaque actuellement sélectionnée
-                self.flip_display()
-                
-                while not has_acted: # tant que le tour du joueur n'est pas fini
-                    #affichage du numéros de joueur qui doit jouer 
->>>>>>> 95453ff93c46e225d3294371e1041b60b28a8f2e
 
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
@@ -276,16 +237,27 @@ class Game:
                             if event.key == pygame.K_RETURN:
                             
                                 has_acted = self.gestion_attaque(selected_unit,selected_attack)
-                                selected_unit.is_selected = not has_acted
+                                #selected_unit.is_selected = not has_acted
                                 selecting_attack = has_acted
                                 self.flip_display()
                                 
-                                if selected_attack == 0:  
-                                    selected_unit.attaque(selected_unit.liste_attaque[0],self)
-                                elif selected_attack == 1:  
-                                    selected_unit.attaque(selected_unit.liste_attaque[1],self)
-                                elif selected_attack == 2 : 
-                                    selected_unit.attaque(selected_unit.liste_attaque[0],self)
+                         # Affichage des options principales (Avancer ou Attaquer)
+                    if not selecting_attack:
+                        options = ["Avancer", "Attaquer"]
+                        for i, option in enumerate(options):
+                            color = BLUE if i == current_option else WHITE
+                            texte = font.render(option, True, color)
+                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                            self.screen.blit(texte, text_rect)
+                    
+                    # Affichage des attaques si l'option "Attaquer" est choisie
+                    else:
+                        for i, attack in enumerate(selected_unit.liste_attaque):
+                            color = BLUE if i == selected_attack else WHITE
+                            texte = font.render(attack, True, color)
+                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                            self.screen.blit(texte, text_rect)
+
                 # Gestion des touches du clavier
                 if event.type == pygame.KEYDOWN:
 
@@ -310,67 +282,11 @@ class Game:
                     elif event.key == pygame.K_DOWN:
                         dy = 1
                     
-<<<<<<< HEAD
                     new_x = selected_unit.x + dx
                     new_y = selected_unit.y + dy
                     if not (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V):
                         print("Vous ne pouvez pas sortir des limites de la carte !")
                         continue
-=======
-
-                    # Boucle principale d'événements
-                    for event in pygame.event.get():
-                        # Gestion de la fermeture de la fenêtre
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            exit()
-
-                        # Gestion des touches du clavier
-                        if event.type == pygame.KEYDOWN:
-                            # Si on n'est pas dans le menu d'attaque, afficher les options principales
-                            if not selecting_attack:
-                                # Déplacement du curseur entre "Avancer" et "Attaquer"
-                                if event.key == pygame.K_DOWN:
-                                    current_option = (current_option + 1) % 2
-                                elif event.key == pygame.K_UP:
-                                    current_option = (current_option - 1) % 2
-                                
-                                # Si l'option "Attaquer" est sélectionnée
-                                if event.key == pygame.K_RETURN and current_option == 1:
-                                    selecting_attack = True  # On passe dans le menu d'attaque
-                                    self.flip_display()
-
-                                # Si l'option "Avancer" est sélectionnée, on déplace l'unité
-                                if event.key == pygame.K_RETURN and current_option == 0:
-                                    self.move_unit_multiple(selected_unit)
-                                    self.flip_display()
-                                    has_acted = True 
-                                
-                            # Si on est dans le menu d'attaque
-                            else:
-                                # Sélection des attaques
-                                if event.key == pygame.K_DOWN:
-                                    selected_attack = (selected_attack + 1) % len(selected_unit.liste_attaque)
-                                elif event.key == pygame.K_UP:
-                                    selected_attack = (selected_attack - 1) % len(selected_unit.liste_attaque)
-
-                                # Si l'attaque est confirmée
-                                if event.key == pygame.K_RETURN:
-                                
-                                    has_acted = self.gestion_attaque(selected_unit,selected_attack)
-#                                    selected_unit.is_selected = not has_acted
-                                    selecting_attack = has_acted
-                                    self.flip_display()
-
-                    # Affichage des options principales (Avancer ou Attaquer)
-                    if not selecting_attack:
-                        options = ["Avancer", "Attaquer"]
-                        for i, option in enumerate(options):
-                            color = BLUE if i == current_option else WHITE
-                            texte = font.render(option, True, color)
-                            text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
-                            self.screen.blit(texte, text_rect)
->>>>>>> 95453ff93c46e225d3294371e1041b60b28a8f2e
                     
                     # Vérification des cases de régénération
                     for cas in self.cases_reg:
@@ -458,6 +374,8 @@ class Game:
                                 selected_unit.attack(enemy)
                                 if enemy.health <= 0:
                                     self.enemy_units.remove(enemy)
+                                if selected_unit.puissance_attaque >= ATTAQUE_DESTRUCTRICE :
+                                    self.mur.remove()
 
                                 has_acted = True
                                 selected_unit.is_selected = False
@@ -485,14 +403,20 @@ class Game:
          
 
     def gestion_attaque(self, selected_unit,selected_attack):
-
-        if selected_attack == 0:  
+        if selected_attack == 0: 
+            print(f'{selected_unit.liste_attaque[0]}') 
             Attack = selected_unit.vise_attaque(selected_unit.liste_attaque[0],self)
+            print(f"Résultat de vise_attaque : {Attack}")
+            if Attack :
+                print(f'Cible trouvée, exécution de l attaque')
+                selected_unit.execute_attaque(self, Attack)
         elif selected_attack == 1:  
-            selected_unit.vise_attaque(selected_unit.liste_attaque[1],self)
+            Attack = selected_unit.vise_attaque(selected_unit.liste_attaque[1],self)
+            print(f'{selected_unit.liste_attaque[1]}')
             return True
         elif selected_attack == 2 : 
-            selected_unit.vise_attaque(selected_unit.liste_attaque[2],self)
+            Attack = selected_unit.vise_attaque(selected_unit.liste_attaque[2],self)
+            print(f'{selected_unit.liste_attaque[2]}')
             return True
         
         running = True # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
@@ -510,15 +434,12 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     # Terminer le déplacement avec la touche Espace
                     if event.key == pygame.K_SPACE:
-                        print("Attack Annulée.")
+                        print("Attack terminée.")
+                        running = False
                         return False
 
                     if event.key == pygame.K_RETURN:
-                        Attack = selected_unit.execute_attaque(self, Attack)
-                        if Attack == None:
-                            running = False
-                            continue 
-
+                        pass
 
                     # Calcul du déplacement
                     dx, dy = 0, 0
@@ -549,12 +470,8 @@ class Game:
 
                     # Déplacement valide : mettre à jour la position de l'unité
                     Attack.move(dx,dy)
-
-
         print("attaque terminé")
         return True
-    
-
 
     
     def move_unit_multiple(self, selected_unit):
@@ -562,10 +479,7 @@ class Game:
         running = True
         Rlist = self.bfs_reachable(selected_unit) # utilise BFS pathfinding algorithme pour trouver les positions atteignable par l'unité 
         print(Rlist)
-         # Calcul des nouvelles coordonnées
-        new_x = selected_unit.x + dx
-        new_y = selected_unit.y + dy
-
+        
         # Stocker les coordonnées initiales de l'unité pour calculer la distance parcourue
         while running:
             self.flip_display(Rlist)  # Mettre à jour l'affichage
@@ -656,30 +570,14 @@ class Game:
     
     def is_occupied_by_unit(self, x, y):
         """Vérifie si une case est occupée par une unité."""
-        if self.is_occupied_by_player(x,y) or self.is_occupied_by_enemy(x,y):
-            return True
-        return False
-    
-    def is_occupied_by_player(self, x, y):
-        for unit in self.player_units:
+        for unit in self.player_units + self.enemy_units:
             if unit.x == x and unit.y == y:
                 return True
         return False
-    
-    def is_occupied_by_enemy(self, x, y):
-        for unit in self.enemy_units:
-            if unit.x == x and unit.y == y:
-                return True
-        return False
-    
-    def unit_at_position(self, x, y):
-        for unit in self.enemy_units + self.player_units:
-            if unit.x == x and unit.y == y:
-                return unit
-    
+
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
-        self.flip_display()
+
         for enemy in self.enemy_units:
             if enemy.type == "Roi":  # Le roi se déplace seulement si un joueur est dans l'arène finale
                 if self.peu_jouer_roi(salles):  
@@ -695,23 +593,23 @@ class Game:
                         enemy.move(dx, dy)
                     #choix d'une attaque aléatoire
                     attaque_choix = random.randint(0, 2)
-                    enemy.attaque(enemy.liste_attaque[attaque_choix], self)
+                    enemy.attaque(self, enemy.liste_attaque[attaque_choix])
                 else:
                     continue
 
             else:  # Pour les autres ennemis
                 # Déplacement aléatoire vers un joueur
-                if enemy.is_selected:
-                    enemy.is_selected = False
-                    continue
-                else:
-                    print(f"tour de enemie {enemy.type}")
-                    target = self.select_target_unit(enemy) #Position x,y de l'unité a viser
-                    dx, dy = self.get_best_adjacent_move(enemy, self.unit_at_position(target[0],target[1]))
+                target = random.choice(self.player_units)
+                dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
+                dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
+
+                new_x, new_y = enemy.x + dx, enemy.y + dy
+                
+                if 0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V and not self.is_wall(new_x, new_y) and not self.is_occupied_by_unit( new_x, new_y):
                     enemy.move(dx, dy)
 
                 attaque_choix = random.randint(0, 2)
-                enemy.attaque(enemy.liste_attaque[attaque_choix], self)
+                enemy.attaque(self, enemy.liste_attaque[attaque_choix])
 
             
 
@@ -893,9 +791,9 @@ class Game:
             elif player_class == "Guerrier":
                     self.player_units.append(Guerrier_player(i,0))
 
-        self.enemy_units = [Vampire_enemy(2,4),
-                            Mage_enemy(1,4),
-                            Guerrier_enemy(3,4),
+        self.enemy_units = [Vampire_enemy(6,6),
+                            Mage_enemy(7,6),
+                            Guerrier_enemy(8,6),
                             Roi_enemy(37,21)]
        
     def En_jeu(self) : 

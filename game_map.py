@@ -7,6 +7,10 @@ from unit import *
 centre_x = GRID_SIZE_H//2
 centre_y = GRID_SIZE_V//2
 
+class Mur :
+    def __init__(self):
+        self
+
 def mur():
     walls = []
     
@@ -80,28 +84,7 @@ def mur():
 
     return walls
 
-def generate_rooms(salles):
-    """
-    Divise la grille en cinq salles en utilisant NumPy.
-    Retourne un tableau NumPy représentant les salles.
-    """
-    rooms = np.zeros((GRID_SIZE_H, GRID_SIZE_V), dtype=int)
-    mid_x, mid_y = GRID_SIZE_H / 2, GRID_SIZE_V / 2
 
-    for x in range(GRID_SIZE_H):
-        for y in range(GRID_SIZE_V):
-            if (x < mid_x and y < 7) or (x < 15 and y < mid_y):
-                rooms[x, y] = salles[0].id  # Salle 1 (haut gauche)
-            elif (x > mid_x and y < 7) or (x >= mid_x + 6 and y < mid_y):
-                rooms[x, y] = salles[1].id  # Salle 2 (haut droit)
-            elif (x < mid_x and y >= mid_y + 6) or (x < 15 and y > mid_y):
-                rooms[x, y] = salles[2].id  # Salle 3 (bas gauche)
-            elif (x > mid_x and y >= mid_y + 6) or (x >= mid_x + 6 and y > mid_y):
-                rooms[x, y] = salles[3].id  # Salle 4 (bas droit)
-            else:
-                rooms[x, y] = salles[4].id  # Salle 5 (arène)
-
-    return rooms
 
 # détection des murs
 def is_near_wall(grid_x, grid_y, walls):
@@ -142,7 +125,7 @@ def get_cell_color(grid_x, grid_y, rooms, walls, salles):
         
     if room_id == 3:
         if is_near_wall(grid_x, grid_y, walls):
-            return (95, 158, 160)
+            return LIGHT_BLUE
     
     if room_id == 4:
         if is_near_wall(grid_x, grid_y, walls):
@@ -203,7 +186,7 @@ def teleport_unit(unit, target_pos, rooms, salles):
       #  def passages_secrets ():
 
 class GameObject:
-    def __init__(self, x, y, name, color):
+    def __init__(self, x, y, name, image):
         """
         Initialise un objet à une position spécifique.
         - x, y: Position de l'objet en cellules.
@@ -214,13 +197,18 @@ class GameObject:
         self.x = x
         self.y = y
         self.name = name
-        self.color = color
+        self.object_image = image
         
     def draw(self, screen):
-        """Dessine l'objet sur l'écran."""
-        rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-        pygame.draw.rect(screen, self.color, rect)
-    
+        if self.object_image:
+            # Dessine l'image de l'objet
+            screen.blit(pygame.transform.scale(self.object_image, (CELL_SIZE, CELL_SIZE)),
+                        (self.x * CELL_SIZE, self.y * CELL_SIZE))
+        else:
+            # Optionnel : Affiche un cercle ou une couleur par défaut si aucune image n'est définie
+            rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(screen, self.color, rect)
+
     def __repr__(self):
         return f"GameObject({self.name}, {self.x}, {self.y})"
 
@@ -229,9 +217,9 @@ def generate_objects():
     Crée une liste d'objets du jeu.
     """
     objets = [
-        GameObject(4, 4, 'Clef', GREEN),  # Exemple : une épée
-        GameObject(centre_x - 2, centre_y - 2, 'Badge', GREEN),  # badge
-        GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', GREEN)  #pass
+        GameObject(4, 4, 'Clef', image_clef),  # Exemple : une épée
+        GameObject(centre_x - 2, centre_y - 2, 'Badge', image_clef),  # badge
+        GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', image_clef)  #pass
     ]
     return objets
 
@@ -290,6 +278,29 @@ class salle:
         print(f"Accès à la salle {self.id} autorisé.")
         self.ouverte = True
         return True
+
+def generate_rooms(salles):
+    """
+    Divise la grille en cinq salles en utilisant NumPy.
+    Retourne un tableau NumPy représentant les salles.
+    """
+    rooms = np.zeros((GRID_SIZE_H, GRID_SIZE_V), dtype=int)
+    mid_x, mid_y = GRID_SIZE_H / 2, GRID_SIZE_V / 2
+
+    for x in range(GRID_SIZE_H):
+        for y in range(GRID_SIZE_V):
+            if (x < mid_x and y < 7) or (x < 15 and y < mid_y):
+                rooms[x, y] = salles[0].id  # Salle 1 (haut gauche)
+            elif (x > mid_x and y < 7) or (x >= mid_x + 6 and y < mid_y):
+                rooms[x, y] = salles[1].id  # Salle 2 (haut droit)
+            elif (x < mid_x and y >= mid_y + 6) or (x < 15 and y > mid_y):
+                rooms[x, y] = salles[2].id  # Salle 3 (bas gauche)
+            elif (x > mid_x and y >= mid_y + 6) or (x >= mid_x + 6 and y > mid_y):
+                rooms[x, y] = salles[3].id  # Salle 4 (bas droit)
+            else:
+                rooms[x, y] = salles[4].id  # Salle 5 (arène)
+
+    return rooms
 
 class CaseRegeneration:
     def __init__(self, x, y, color):
@@ -387,8 +398,21 @@ class Trap:
 def generate_traps():
     
     traps = [
-        Trap (2, 3, KAKI, "spikes", damage=10),
-        Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 5, YELLOW, "poison", damage=5)
+        #Salle 1
+        Trap (2, 3, KAKI, "spikes", damage=2),
+        Trap (2, centre_y - 1, BROWN, "spikes", damage=2),
+
+        #Salle 2
+        Trap (centre_x + 6, 6, GREEN, "spikes", damage=5),
+        Trap (GRID_SIZE_H + 3, centre_y - 4, GREEN, "spikes", damage=5),
+
+        #Salle3
+        Trap (2, centre_y + 2, LIGHT_BLUE, "spikes", damage=10),
+        Trap (centre_x - 2, GRID_SIZE_V - 3, LIGHT_BLUE, "spikes", damage=10),
+        
+        #Salle du trône
+        Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 6, YELLOW, "poison", damage=15),
+        Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 7, YELLOW, "poison", damage=15),
         ]
     for trap in traps:
         print(f"Piège généré : {trap.trap_type} à ({trap.x}, {trap.y})")  # Debug
