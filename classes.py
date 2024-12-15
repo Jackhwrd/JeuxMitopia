@@ -79,9 +79,9 @@ class Mage_player(Unit):
         if monstre.type == "Mage": 
             degat_final = degat 
         elif monstre.type == "Vampire" : 
-            degat_final = degat*2
+            degat_final = degat/2
         elif monstre.type == "Guerrier": 
-            degat_final = degat / 2
+            degat_final = degat * 2
         else : 
             degat_final = degat
         
@@ -206,11 +206,11 @@ class Vampire_player(Unit):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """
 
         if monstre.type == "Mage": 
-            degat_final = degat / 2
+            degat_final = degat * 2
         elif monstre.type == "Vampire" : 
             degat_final = degat
         elif monstre.type == "Guerrier": 
-            degat_final = degat * 2
+            degat_final = degat / 2
         else :
             degat_final = degat
             
@@ -319,9 +319,9 @@ class Guerrier_player(Unit):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant ainsi que de la statistique de defense"""
 
         if monstre.type == "Mage": 
-            degat_final = degat * 2
+            degat_final = degat / 2
         elif monstre.type == "Vampire" : 
-            degat_final = degat/2
+            degat_final = degat * 2
         elif monstre.type == "Guerrier": 
             degat_final = degat 
         else : 
@@ -396,11 +396,11 @@ class Vampire_enemy(Unit):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """
 
         if monstre.type == "Mage": 
-            degat_final = degat / 2
+            degat_final = degat * 2
         elif monstre.type == "Vampire" : 
             degat_final = degat
         elif monstre.type == "Guerrier": 
-            degat_final = degat * 2
+            degat_final = degat / 2
             
         return degat_final-(degat*self.stat_defense)
     
@@ -469,9 +469,9 @@ class Guerrier_enemy(Unit):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant ainsi que de la statistique de defense"""
 
         if monstre.type == "Mage": 
-            degat_final = degat * 2
+            degat_final = degat / 2
         elif monstre.type == "Vampire" : 
-            degat_final = degat/2
+            degat_final = degat * 2
         elif monstre.type == "Guerrier": 
             degat_final = degat 
             
@@ -488,9 +488,9 @@ class Mage_enemy(Unit):
         if monstre.type == "Mage": 
             degat_final = degat 
         elif monstre.type == "Vampire" : 
-            degat_final = degat*2
-        elif monstre.type == "Guerrier": 
             degat_final = degat / 2
+        elif monstre.type == "Guerrier": 
+            degat_final = degat * 2
         
         return degat_final-(degat*self.stat_defense)
     
@@ -613,7 +613,7 @@ class Status_enemy(Unit):
         elif monstre.type == "Vampire" : 
             degat_final = degat*1.25
         elif monstre.type == "Guerrier": 
-            degat_final = degat *0.75
+            degat_final = degat * 0.75
         else : 
             degat_final = degat 
         
