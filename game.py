@@ -179,6 +179,14 @@ class Game:
                     if not (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V):
                         print("Vous ne pouvez pas sortir des limites de la carte !")
                         continue
+                    
+                    # Vérification des cases de régénération
+                    for cas in self.cases_reg:
+                        if cas.x == new_x and cas.y == new_y:
+                            print(f"Régénération de l'unité {selected_unit}")
+                            cas.appliquer_effet(selected_unit, self)  # Déclenche les effets du piège
+                            
+                            break
 
                     # Vérification des pièges
                     #trap_found = False
@@ -438,24 +446,7 @@ class Game:
                             selected_unit.has_object.append(obj)
                             print(f"Inventaire : {selected_unit.has_object[-1].name}.")
                             break
-                    
-                    # Vérification des pièges
-                    for tra in self.traps:
-                        if tra.x == new_x and tra.y == new_y:
-                            print(f"Déplacement annulé : {selected_unit} a été bloquée par un {tra.trap_type}.")
-                            if tra.trigger_on_step:  # Si le piège est activé par le mouvement
-                                if tra.is_active:
-                                    print(f"Le piège {tra.trap_type} s'active !")
-                                    if tra.trigger(selected_unit):  # Déclenche le piège
-                                        print(f"Déplacement annulé à cause du piège {tra.trap_type}.")
-                                        return False  # Bloquer le mouvement
-                            else:
-                                print(f"Le piège {tra.trap_type} est inactif.")
-                            break
-                        # Si aucun piège ne bloque, l'unité se déplace
-                        selected_unit.move(dx, dy)
-                        print(f"L'unité {selected_unit} s'est déplacée vers ({selected_unit.x}, {selected_unit.y}).")
-                        return True                   
+                       
             
 
     def is_wall(self, x, y):
@@ -702,21 +693,7 @@ class Game:
             self.spawn_monsters(salles)
             self.game_over()
             
-    def check_trap(self, x, y, unit):
-        """
-        Vérifie si une unité marche sur un piège.
-        :param x: Position X à vérifier.
-        :param y: Position Y à vérifier.
-        :param unit: L'unité qui se déplace.
-        """
-        for tra in self.traps:
-            if tra.x == x and tra.y == y and tra.is_active:
-                print(f"L'unité {unit} a marché sur le piège {tra.trap_type} à ({tra.x}, {tra.y})")
-                if tra.trigger(unit):
-                    print(f"Le déplacement est bloqué par le piège {tra.trap_type}.")
-                return True
-        return False
-
+   
 def main():
 
     # Initialisation de Pygame

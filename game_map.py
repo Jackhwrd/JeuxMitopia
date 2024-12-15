@@ -298,24 +298,25 @@ class CaseRegeneration:
         self.y = y
         self.color = color
 
-    def appliquer_effet(self, unité, game):
+    def appliquer_effet(self, unit, game):
         """
         Applique l'effet de régénération lorsqu'une unité se trouve sur cette case.
         unité : instance de l'unité qui se trouve sur la case
         game : instance du jeu contenant les unités
         """
         # Régénération pour l'unité qui se trouve sur la case
-        regen = unité.health_max * 0.2  # Par exemple, régénérer 20% de la santé max
-        unité.health = min(unité.health + regen, unité.health_max)  # Ne pas dépasser la santé max
+        regen = unit.max_health * 0.2  # Par exemple, régénérer 20% de la santé max
+        unit.health = min(unit.health + regen, unit.max_health)  # Ne pas dépasser la santé max
+        print(f'{unit.health}')
 
         # Drain de vie des ennemis adjacents
         for enemy in game.enemy_units:
             distance = abs(self.x - enemy.x) + abs(self.y - enemy.y)
             if 1 <= distance <= 1:  # Pour les ennemis autour de la case
-                degat = unité.puissance_attaque * unité.stat_attaque
-                degat_final = enemy.degat_subit(unité, degat)
+                degat = unit.puissance_attaque * unit.stat_attaque
+                degat_final = enemy.degat_subit(unit, degat)
                 enemy.update_health(degat_final)
-                unité.health = min(unité.health + degat_final / 2, unité.health_max)
+                unit.health = min(unit.health + degat_final / 2, unit.max_health)
                 if not enemy.en_vie:
                     game.enemy_units.remove(enemy)
                 break  # On affecte un seul ennemi à la fois
@@ -406,18 +407,6 @@ ecuries = salle(4, YELLOW, False, 3)
 arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
 
 salles = [cave, sellier, cuisines, ecuries, arene]
-"""
-# Création des cases de régénération
-case1 = CaseRegeneration (centre_x + 2, GRID_SIZE_V - 3, LIGHT_YELLOW)
-case2 = CaseRegeneration (centre_x + 2, GRID_SIZE_V - 2, LIGHT_YELLOW)
 
-cases_regeneration = [case1, case2]
-
-# Création des pièges
-trap1 = Trap (2, 6, KAKI, "spikes", damage=10)
-trap2 = Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 5, YELLOW, "poison", damage=5, effect="poison")
-
-traps = [trap1, trap2]
-"""
 for salle in salles:
     salle.afficher_infos()
