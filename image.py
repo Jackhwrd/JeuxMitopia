@@ -58,6 +58,7 @@ image_mechant_mage = pygame.image.load("image/mechant_mage.png")
 image_guts = pygame.image.load("image/guts.jpeg")
 image_vampire = pygame.image.load("image/vampire.jpg")
 image_clef = pygame.image.load("image/key.png")
+image_cristal = pygame.image.load("image/cristal.png")
 image_viseur = pygame.Surface((CELL_SIZE, CELL_SIZE), pygame.SRCALPHA)
 pygame.draw.circle(image_viseur, RED, (CELL_SIZE // 2, CELL_SIZE // 2), CELL_SIZE//2, width=3)
 pygame.draw.line(image_viseur, BLACK, (0, CELL_SIZE//2 - 1),(CELL_SIZE, CELL_SIZE//2 - 1), 2)  # Ligne Horizontale

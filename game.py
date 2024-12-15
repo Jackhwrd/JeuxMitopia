@@ -206,7 +206,7 @@ class Game:
 
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
-                        # Si on n'est pas dans le menu d'attaque, afficher les options principales
+                        # Si on n'est pas dans le menu d'attaque,  les options principales
                         if not selecting_attack:
                             # Déplacement du curseur entre "Avancer" et "Attaquer"
                             if event.key == pygame.K_DOWN:
@@ -310,23 +310,50 @@ class Game:
                             break
                     
                     
-                    # Si la touche entrer est appuyée, essayer de ramasser un objet
+                    # Si la touche Rshift est appuyée, essayer de ramasser un objet
                     if event.key == pygame.K_RSHIFT:  # Touche entrer du pavé numérique
-                        for obj in self.objects:
-                            if obj.x == selected_unit.x and obj.y == selected_unit.y:
-                                print(f"Vous avez ramassé {obj.name} !")
-                                obj.collected = True  # L'objet est ramassé
-                                self.objects.remove(obj)  # Retirer de la carte
-                                
-                                # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
-                                if not hasattr(selected_unit, 'has_object'):
-                                    selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
-
-                                selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
-                                print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
-                                break 
-                    
+                        # Vérifier si un cristal peut être déposé sur une case requise
+                        cristal_depose = False  # Flag pour éviter le ramassage juste après le dépôt
                         
+                        if "Cristaux" in salle_trone.conditions:
+                            crystal_positions = salle_trone.conditions["Cristaux"]  # Récupérer les positions requises pour les cristaux
+                                # Vérifier si l'unité est sur une de ces positions
+                            for x, y in crystal_positions:
+                                if selected_unit.x == x and selected_unit.y == y:
+                                    # Vérifier si l'unité possède un cristal
+                                    for obj in selected_unit.has_object:
+                                        if obj.name == "Cristal":
+                                            print(f"Vous avez déposé un {obj.name} à ({x}, {y}) pour la salle 5 !")
+                                            
+                                            # Retirer l'objet de l'inventaire de l'unité
+                                            selected_unit.has_object.remove(obj)
+                                            
+                                            # Ajouter l'objet à la carte
+                                            new_crystal = GameObject(x, y, "Cristal", image_cristal)  # Cristal de couleur verte
+                                            salle_trone.objet.append(new_crystal)  # Ajouter le cristal à la carte
+                                            selected_unit.has_object.append(new_crystal)                                        
+                                            # Afficher le message
+                                            print(f"Le cristal a été déposé à la position ({x}, {y}) pour les conditions de la salle 5.")
+                                            cristal_depose = True  # Dépôt effectué
+                                            break  # Quitter la boucle dès qu'un cristal est déposé
+                                if cristal_depose:
+                                    break  # Si un cristal est déposé, pas besoin de continuer
+                        # Si aucun cristal n'a été déposé, essayer de ramasser un objet
+                        if not cristal_depose:  # Ramassage uniquement si aucun dépôt n'a été effectué
+                            for obj in self.objects:
+                                if obj.x == selected_unit.x and obj.y == selected_unit.y:
+                                    print(f"Vous avez ramassé {obj.name} !")
+                                    obj.collected = True  # L'objet est ramassé
+                                    salle_trone.objet.remove(obj)    # Retirer de la carte
+                                    
+                                    # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
+                                    if not hasattr(selected_unit, 'has_object'):
+                                        selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
+
+                                    selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
+                                    print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
+                                    break
+                            
                     # Vérifier les collisions avec les murs
                     proposed_rect = pygame.Rect(
                         new_x * CELL_SIZE,
@@ -346,14 +373,6 @@ class Game:
                         else 0
                     )
                     salle = next((s for s in salles if s.id == room_id), None)
-
-                    # Si la salle est ouverte
-                    if salle:
-                        if salle.verifier_conditions(selected_unit):
-                            selected_unit.x, selected_unit.y = new_x, new_y
-                            print(f"Vous êtes entré dans la salle {salle.id}.")
-                        else:
-                            print(f"Accès refusé à la salle {salle.id}.")
 
                     # Si le joueur entre dans une salle, vérifier les conditions
                     if salle:

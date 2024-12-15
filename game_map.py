@@ -145,15 +145,7 @@ def get_cell_color(grid_x, grid_y, rooms, walls, salles):
     return salle.couleur  
 
 def teleport_unit(unit, target_pos, rooms, salles):
-    """
-    Téléporte une unité à une position cible et vérifie les conditions d'entrée.
     
-    Args:
-        unit (Unit): L'unité à téléporter.
-        target_pos (tuple): Position cible (x, y) en cellules.
-        rooms (np.ndarray): Tableau NumPy représentant les salles.
-        salles (list): Liste des salles avec leurs conditions.
-    """
     target_x, target_y = target_pos
     
     # Vérifier si les coordonnées sont valides dans la grille
@@ -177,13 +169,6 @@ def teleport_unit(unit, target_pos, rooms, salles):
         # Si aucune salle n'est associée à la position, téléporter normalement
         unit.x, unit.y = target_pos
         print(f"L'unité {unit} a été téléportée à {target_pos}, hors d'une salle définie.")
-
-
-       # def piège ():  --> augmenter les probas d'avoir un piège au fur et à mesure des niveaux
-
-
-
-      #  def passages_secrets ():
 
 class GameObject:
     def __init__(self, x, y, name, image):
@@ -212,6 +197,7 @@ class GameObject:
     def __repr__(self):
         return f"GameObject({self.name}, {self.x}, {self.y})"
 
+
 def generate_objects():
     """
     Crée une liste d'objets du jeu.
@@ -219,7 +205,10 @@ def generate_objects():
     objets = [
         GameObject(4, 4, 'Clef', image_clef),  # Exemple : une épée
         GameObject(centre_x - 2, centre_y - 2, 'Badge', image_clef),  # badge
-        GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', image_clef)  #pass
+        GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', image_clef),  #pass
+        GameObject(11, 5, 'Cristal', image_cristal),  # artefact1, salle1
+        GameObject(centre_x + 8, 1, 'Cristal', image_cristal),  # artefact2, salle2
+        GameObject(7, centre_y + 1, 'Cristal', image_cristal),  # artefact3, salle3
     ]
     return objets
 
@@ -240,7 +229,7 @@ class salle:
         self.couleur = couleur
         self.piège = piège
         self.enemy = enemy if enemy is not None else []
-        self.objet = objet
+        self.objet = []
         self.conditions = conditions if conditions else {}
         self.ouverte = False # fermée par défaut
         self.x_min = x_min
@@ -272,9 +261,23 @@ class salle:
             if condition == "Pierre de téléportation" and not any(obj.name == "Pierre de téléportation" for obj in unit.has_object):
                 print("Condition manquante : Pierre de téléportation requise.")
                 return False
-            if condition == "niveau_min" and unit.niveau < valeur:
-                print(f"Condition manquante : niveau {valeur} requis.")
-                return False
+            if condition == "Cristaux":
+                # Vérifier si tous les cristaux sont placés sur les cases définies
+                cristaux_places = 0
+                print("Contenu de self.objet :", self.objet)
+
+                for x, y in valeur:  # Parcourt les positions requises pour les cristaux
+                    print("Contenu de self.objet :", self.objet)
+                    for obj in self.objet:  # Parcourt les objets présents sur la carte
+                        print("Contenu de self.objet :", self.objet)
+                        print(f"Vérification de l'objet : {obj.name} à la position ({obj.x}, {obj.y})")
+                        if obj.name == "Cristal" and obj.x == x and obj.y == y:
+                            cristaux_places += 1
+                            print(f"Un cristal est placé à ({x}, {y}, cristal n°{cristaux_places}")  # Log de la position validée
+                if cristaux_places < len(valeur):
+                    print(f"Condition manquante : {len(valeur) - cristaux_places} cristal(s) non placé(s) aux positions requises.")
+                    return False
+
         print(f"Accès à la salle {self.id} autorisé.")
         self.ouverte = True
         return True
@@ -404,12 +407,16 @@ def generate_traps():
 
         #Salle 2
         Trap (centre_x + 6, 6, GREEN, "spikes", damage=5),
-        Trap (GRID_SIZE_H + 3, centre_y - 4, GREEN, "spikes", damage=5),
+        Trap (GRID_SIZE_H - 3, centre_y - 4, GREEN, "spikes", damage=5),
+        Trap (centre_x + 9, 1, (120, 0, 60), "spikes", damage=5),
+        Trap (centre_x + 8, 2, (120, 0, 60), "spikes", damage=5),
 
         #Salle3
         Trap (2, centre_y + 2, LIGHT_BLUE, "spikes", damage=10),
         Trap (centre_x - 2, GRID_SIZE_V - 3, LIGHT_BLUE, "spikes", damage=10),
-        
+        Trap (8, centre_y + 1, LIGHT_BLUE, "spikes", damage=10),
+        Trap (7, centre_y + 2, LIGHT_BLUE, "spikes", damage=10),
+
         #Salle du trône
         Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 6, YELLOW, "poison", damage=15),
         Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 7, YELLOW, "poison", damage=15),
@@ -427,10 +434,10 @@ pierre = GameObject((centre_x+8), (centre_y-5), 'Pierre de téléportation', GRE
 cave = salle(1, KAKI, False, 3, objet=clef)
 sellier = salle(2, (0, 255, 0), False, 3, objet=pierre, conditions={"Badge": True})
 cuisines = salle(3, WHITE, False, 3, conditions={"Pierre de téléportation": True})
-ecuries = salle(4, YELLOW, False, 3)
+salle_trone = salle(4, YELLOW, False, 3, conditions={"Cristaux": [(centre_x - 1, centre_y - 1), (centre_x + 1, centre_y - 1), (centre_x - 1, centre_y + 1)]})
 arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
 
-salles = [cave, sellier, cuisines, ecuries, arene]
+salles = [cave, sellier, cuisines, salle_trone, arene]
 
 for salle in salles:
     salle.afficher_infos()
