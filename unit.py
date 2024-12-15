@@ -61,7 +61,6 @@ class Unit:
         self.attaque = None
         
         
-
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
         if 0 <= self.x + dx < GRID_SIZE_H and 0 <= self.y + dy < GRID_SIZE_V:
@@ -72,14 +71,13 @@ class Unit:
         """Attaque une unité cible."""
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
             target.health -= self.attack_power
+
+    def update_attack(self, impact):
+        """Met à jour la santé de l'unité après avoir subi des dégâts."""
+        self.puissance_attaque -= impact
+                
     
     def draw(self, screen):
-        """Affiche l'unité sur l'écran."""
-        #color = BLUE if self.team == 'player' else BLACK
-   
-        # Affiche le cadre vert si l'unité est sélectionnée
-        
-        # Affiche l'image du personnage
         if self.character_image:
             # Dessine l'image du personnage
             screen.blit(pygame.transform.scale(self.character_image, (CELL_SIZE, CELL_SIZE)),
@@ -103,9 +101,6 @@ class Unit:
             self.has_object.append(obj)
             print(f"Vous avez ramassé : {obj.name}!")
             
-    def health(self,degat) : 
-
-        pass 
 
     def update_health(self, degat):
         """Met à jour la santé de l'unité après avoir subi des dégâts."""
@@ -129,3 +124,8 @@ class Unit:
         # Dessiner la barre de vie (proportionnelle à la santé restante)
         health_width = (self.health / self.max_health) * bar_width
         pygame.draw.rect(surface, health_color, [bar_x, bar_y, health_width, bar_height])
+
+    def apply_effect(self, effect):
+        """Applique un effet à l'unité."""
+        self.effects.append(effect)
+        print(f"{self.name} est affecté par {effect}.")

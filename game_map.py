@@ -340,6 +340,59 @@ def generate_cases():
         ]
     return cases_regeneration
 
+class Trap:
+    def __init__(self, x, y, color, trap_type, damage=0, effect=None):
+        """Initialise la case de régénération à une position donnée"""
+        self.x = x
+        self.y = y
+        self.color = color
+        self.trap_type = trap_type
+        self.damage = damage
+        self.effect = effect
+        self.is_active = True  # Le piège peut être désactivé après activation
+        
+
+    def trigger(self, unit):
+        """
+        Active le piège lorsqu'une unité marche dessus.
+        :param unit: L'unité affectée par le piège.
+        """
+        if not self.is_active:
+            print(f"Le piège ({self.trap_type}) à ({self.x}, {self.y}) est déjà désactivé.")
+            return False
+        else :
+            if self.trap_type == "poison":  # Exemple, si le piège est un spike, il bloque le mouvement
+                print(f"Le piège ({self.trap_type}) s'active sur {unit}.")
+                unit.update_health(self.damage)  # Applique des dégâts à l'unité
+                print(f'Damage {unit} = {unit.health - self.damage}')
+                self.is_active = False  # Désactive le piège après activation
+            if self.trap_type == "spikes":  # Exemple, si le piège est un spike, il bloque le mouvement
+                print(f"Le piège ({self.trap_type}) s'active sur {unit}.")
+                unit.update_health(self.damage)  # Applique des dégâts à l'unité
+                print(f'Damage {unit} = {unit.health - self.damage}')
+                self.is_active = False  # Désactive le piège après activation
+        return True
+    
+    def reactivate(self):
+        """Réactive le piège."""
+        self.is_active = True
+        self.block_movement = False  # Réactive également la possibilité de se déplacer sur la case
+        print(f"Le piège ({self.trap_type}) à ({self.x}, {self.y}) est réactivé.")
+
+    def draw(self, screen):
+        rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        pygame.draw.rect(screen, self.color, rect)
+    
+def generate_traps():
+    
+    traps = [
+        Trap (2, 3, KAKI, "spikes", damage=10),
+        Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 5, YELLOW, "poison", damage=5)
+        ]
+    for trap in traps:
+        print(f"Piège généré : {trap.trap_type} à ({trap.x}, {trap.y})")  # Debug
+    return traps
+
 # Création d'un objet GameObject
 clef = GameObject(4, 4, 'Clef', GREEN)
 badge = GameObject(centre_x, centre_y, 'Badge', GREEN)
@@ -353,12 +406,18 @@ ecuries = salle(4, YELLOW, False, 3)
 arene = salle(5, RED, False, 3, objet=badge, conditions={"Clef": True})
 
 salles = [cave, sellier, cuisines, ecuries, arene]
-
+"""
 # Création des cases de régénération
-case1 = CaseRegeneration (GRID_SIZE_H - 4, GRID_SIZE_V - 3, LIGHT_YELLOW)
+case1 = CaseRegeneration (centre_x + 2, GRID_SIZE_V - 3, LIGHT_YELLOW)
 case2 = CaseRegeneration (centre_x + 2, GRID_SIZE_V - 2, LIGHT_YELLOW)
 
 cases_regeneration = [case1, case2]
 
+# Création des pièges
+trap1 = Trap (2, 6, KAKI, "spikes", damage=10)
+trap2 = Trap (GRID_SIZE_H - 3, GRID_SIZE_V - 5, YELLOW, "poison", damage=5, effect="poison")
+
+traps = [trap1, trap2]
+"""
 for salle in salles:
     salle.afficher_infos()
