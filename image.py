@@ -12,6 +12,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)           #base RVB
 BLUE = (0, 0, 255)
+LIGHT_BLUE = (95, 158, 160)
 GREEN = (0, 255, 0)
 
 
@@ -24,6 +25,7 @@ HEIGHT = GRID_SIZE_V * CELL_SIZE
 FPS = 30
 drop_width = 8
 drop_height = 11
+ATTAQUE_DESTRUCTRICE = 80
 
 # Couleurs
 BLANC = (255, 255, 255)
@@ -55,6 +57,8 @@ image_mechant_vampire = pygame.image.load("image/mechant_vampire.png")
 image_mechant_mage = pygame.image.load("image/mechant_mage.png")
 image_guts = pygame.image.load("image/guts.jpeg")
 image_vampire = pygame.image.load("image/vampire.jpg")
+image_clef = pygame.image.load("image/key.png")
+image_cristal = pygame.image.load("image/cristal.png")
 image_viseur = pygame.Surface((CELL_SIZE, CELL_SIZE), pygame.SRCALPHA)
 pygame.draw.circle(image_viseur, RED, (CELL_SIZE // 2, CELL_SIZE // 2), CELL_SIZE//2, width=3)
 pygame.draw.line(image_viseur, BLACK, (0, CELL_SIZE//2 - 1),(CELL_SIZE, CELL_SIZE//2 - 1), 2)  # Ligne Horizontale
@@ -80,7 +84,6 @@ image_selectionner_allié = pygame.Surface((CELL_SIZE, CELL_SIZE), pygame.SRCALP
 pygame.draw.rect(image_selectionner_allié, GREEN, (0, 0, CELL_SIZE, CELL_SIZE), width = 3)
 
 
-
 # Initialisation de la police
 font = pygame.font.Font("acadian_runes/police.ttf", 80)  
 
@@ -89,7 +92,3 @@ font_game = pygame.font.Font("acadian_runes/police.ttf", 48)
 font_credit = pygame.font.Font("acadian_runes/police.ttf", 40)  
 font_j = pygame.font.Font("acadian_runes/police.ttf", 20)
 font_affi_joueur = pygame.font.Font("acadian_runes/police.ttf", 30)
-
-
-
-
