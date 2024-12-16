@@ -368,7 +368,7 @@ class Vampire_enemy(Unit):
                 else :
                     self.health = self.max_health
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
     
     def Furtif(self,game) : 
         "Tape un adversaire qui se trouve dans un rayon de 4 Block "
@@ -380,7 +380,7 @@ class Vampire_enemy(Unit):
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
             break 
 
     def Brouiller(self,game) : 
@@ -439,7 +439,7 @@ class Guerrier_enemy(Unit):
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
 
             break 
 
@@ -471,7 +471,7 @@ class Guerrier_enemy(Unit):
                 degat_final = enemy.degat_subit(self, degat)
                 enemy.update_health(degat_final)
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
                     
     def attaque(self,attaque_choisie,game):
         
@@ -524,7 +524,7 @@ class Mage_enemy(Unit):
                 enemy.update_health(degat_final)
                 
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
                     
                 
 
@@ -544,7 +544,7 @@ class Mage_enemy(Unit):
                     self.health = self.max_health
                 
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
 
         for ami in game.enemy_units:
 
@@ -609,7 +609,7 @@ class Status_enemy(Unit):
                 enemy.update_health(degat_final)
                 
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
 
     def Touche_loin(self,game) : 
         for enemy in game.player_units:
@@ -621,7 +621,7 @@ class Status_enemy(Unit):
                 enemy.update_health(degat_final)
                 
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
                 break
 
     def degat_subit(self,monstre,degat):
@@ -676,10 +676,10 @@ class Roi_enemy(Unit):
                 enemy.update_health(degat_final)
                 
                 if not enemy.en_vie:
-                    game.enemy_units.remove(enemy)
+                    game.player_units.remove(enemy)
 
     def Invoquer(self,game) : 
-        game.create_monsters_in_room(self, 5)
+        game.create_monsters_in_room(arene)
 
     def degat_subit(self,monstre,degat):
         """Fonction qui permet de calculer le dommage final en suivant du type de l'attaquant """

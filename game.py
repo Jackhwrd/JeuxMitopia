@@ -19,6 +19,8 @@ class Game:
         self.enemy_images = [image_mechant_guerier, image_mechant_vampire, image_mechant_mage]
         self.player_class = player_classe # liste des classes des joueurs 
         self.screen = screen
+        self.player_units = []
+        self.enemy_units = []
         self.walls = mur()
         self.salles = salles
         self.rooms = generate_rooms(salles)
@@ -140,23 +142,19 @@ class Game:
         # Initialiser le meilleur mouvement et sa distance
         best_move = (0,0)
         min_distance = float('inf')
-        print(min_distance)
 
  
         # Explorer toutes les directions pour trouver la case adjacente la plus proche de la cible
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
-            print(nx,ny)
 
             # Vérifier si la nouvelle position est dans les limites et n'est pas un mur
             if 0 <= nx < WIDTH and 0 <= ny < HEIGHT and not self.is_wall(nx, ny) and not self.is_occupied_by_unit(nx,ny):
                     # Vérifier si la position actuelle est plus proche de la cible que le meilleur mouvement précédent
                 target_distance = abs(target_x - nx) + abs(target_y - ny)  # Distance de Manhattan à la cible
-                print(target_distance)
                 if target_distance < min_distance:
                     min_distance = target_distance
                     best_move = (dx, dy)
-        print(best_move)
         return best_move
     
 
@@ -165,7 +163,6 @@ class Game:
     def handle_player_turn(self):
         """Tour du joueur"""
         for rang_joueur, selected_unit in enumerate (self.player_units):
-            print("dans boucle for")
 
                 # Tant que l'unité n'a pas terminé son tour
             has_acted = False
@@ -174,11 +171,9 @@ class Game:
             current_option = 0  # Option actuelle
             selected_attack = 0  # Attaque actuellement sélectionnée
             self.flip_display()
-            print("jeu sur screen")
                 
             while not has_acted: # tant que le tour du joueur n'est pas fini
                     #affichage du numéros de joueur qui doit jouer 
-                    print("dans boucle while")
                     phrase = f"Joueur {rang_joueur + 1 }, à toi de jouer !"
                     texte = font_affi_joueur.render(phrase, True, WHITE)
                     text_rect = texte.get_rect(center=(540, 20))  # Espacement vertical entre les options
@@ -231,7 +226,6 @@ class Game:
                                 
                          # Affichage des options principales (Avancer ou Attaquer)
                     if not selecting_attack:
-                        print("le text devrait s'afficher sur l'écran")
                         options = ["Avancer", "Attaquer"]
                         for i, option in enumerate(options):
                             color = BLUE if i == current_option else WHITE
@@ -246,166 +240,9 @@ class Game:
                             texte = font.render(attack, True, color)
                             text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
                             self.screen.blit(texte, text_rect)
-                            
-            pygame.display.flip()
-#           
-#
-#
 
-                # Gestion des touches du clavier
-#                if event.type == pygame.KEYDOWN:
-#
-#                    # Déplacement (touches fléchées)
-#                    dx, dy = 0, 0
-#                    if event.key == pygame.K_LEFT:
-#                        dx = -1
-#                        if selected_unit.x == 0 and selected_unit.y == GRID_SIZE_V - 1:
-#                            target_pos = (GRID_SIZE_H - 1, 0)  # Par exemple, coordonnées de téléportation
-#                            teleport_unit(selected_unit, target_pos, self.rooms, self.salles)
-#                    elif event.key == pygame.K_RIGHT:
-#                        dx = 1
-#                        # Téléportation si en haut à droite
-#                        if selected_unit.x == GRID_SIZE_H - 1 and selected_unit.y == 0:
-#                            target_pos = (0, GRID_SIZE_V - 1)  # Par exemple, coordonnées de téléportation
-#                            teleport_unit(selected_unit, target_pos, self.rooms, self.salles)
-#                            #self.flip_display()
-#                            #has_acted = True
-#                            continue
-#                    elif event.key == pygame.K_UP:
-#                        dy = -1
-#                    elif event.key == pygame.K_DOWN:
-#                        dy = 1
-#                    
-#                    new_x = selected_unit.x + dx
-#                    new_y = selected_unit.y + dy
-#                    if not (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V):
-#                        print("Vous ne pouvez pas sortir des limites de la carte !")
-#                        continue
-#                    
-#                    # Vérification des cases de régénération
-#                   for cas in self.cases_reg:
-#                        if cas.x == new_x and cas.y == new_y:
-#                            print(f"Régénération de l'unité {selected_unit}")
-#                            cas.appliquer_effet(selected_unit, self)  # Déclenche les effets du piège
-#                            break#
-#
-#                    # Vérification des pièges
-#                    #trap_found = False
-#                    for trap in self.traps:
-#                        if trap.x == new_x and trap.y == new_y:
-#                            print(f"Unité {selected_unit} a rencontré un piège {trap.trap_type}.")
-#                            trap.is_active = True
-#                            #trap_found = True  # Indique que le mouvement est bloqué
-#                            #print(f"Le piège {trap.trap_type} s'active sur {selected_unit}.")
-#                            trap.trigger(selected_unit)  # Déclenche les effets du piège
-#                            #trap.block_movement :  # Si le piège bloque le mouvement
-#                            dx, dy = 0, 0
-#                            break
-#                    
-#                    
-#                    # Si la touche Rshift est appuyée, essayer de ramasser un objet
-#                    if event.key == pygame.K_RSHIFT:  # Touche entrer du pavé numérique
-#                        # Vérifier si un cristal peut être déposé sur une case requise
-#                        cristal_depose = False  # Flag pour éviter le ramassage juste après le dépôt
-#                        
-#                        if "Cristaux" in salle_trone.conditions:
-#                            crystal_positions = salle_trone.conditions["Cristaux"]  # Récupérer les positions requises pour les cristaux
-#                                # Vérifier si l'unité est sur une de ces positions
-#                            for x, y in crystal_positions:
-#                                if selected_unit.x == x and selected_unit.y == y:
-#                                    # Vérifier si l'unité possède un cristal
-#                                    for obj in selected_unit.has_object:
-#                                        if obj.name == "Cristal":
-#                                            print(f"Vous avez déposé un {obj.name} à ({x}, {y}) pour la salle 5 !")
-#                                            
-#                                            # Retirer l'objet de l'inventaire de l'unité
-#                                            selected_unit.has_object.remove(obj)
-                                            
-#                                            # Ajouter l'objet à la carte#
-#                                            new_crystal = GameObject(x, y, "Cristal", image_cristal)  # Cristal de couleur verte
-#                                            self.objet.append(new_crystal)  # Ajouter le cristal à la carte
-#                                            selected_unit.has_object.append(new_crystal)                                        
-#                                            # Afficher le message
-#                                            print(f"Le cristal a été déposé à la position ({x}, {y}) pour les conditions de la salle 5.")
-#                                            cristal_depose = True  # Dépôt effectué
-#                                            break  # Quitter la boucle dès qu'un cristal est déposé
-#                                if cristal_depose:
-#                                    break  # Si un cristal est déposé, pas besoin de continuer
-#                        # Si aucun cristal n'a été déposé, essayer de ramasser un objet
-#                        if not cristal_depose:  # Ramassage uniquement si aucun dépôt n'a été effectué
-#                            for obj in self.objects:
-#                                if obj.x == selected_unit.x and obj.y == selected_unit.y:
-#                                    print(f"Vous avez ramassé {obj.name} !")
-#                                    obj.collected = True  # L'objet est ramassé
-#                                    self.objet.remove(obj)    # Retirer de la carte
-#                                    
-#                                    # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
-#                                    if not hasattr(selected_unit, 'has_object'):
-#                                       selected_unit.has_object = []  # Si la liste n'existe pas, créez-la
-#
-#                                    selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
-#                                    print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
-#                                    break
-#                            
-#                    # Vérifier les collisions avec les murs
-#                    proposed_rect = pygame.Rect(
-#                        new_x * CELL_SIZE,
-#                        new_y * CELL_SIZE,
-#                        CELL_SIZE,
-#                        CELL_SIZE,
-#                    )
-#                    if any(proposed_rect.colliderect(wall) for wall in self.walls):
-#                        print("Collision détectée ! Mouvement annulé.")
-#                        # Collision détectée : ne pas appliquer le déplacement
-#                        continue##
-#
-#
-#                    # Vérifier si le joueur tente d'entrer dans une salle
-#                    room_id = (
-#                        self.rooms[new_x, new_y]
-#                        if (0 <= new_x < GRID_SIZE_H and 0 <= new_y < GRID_SIZE_V)
-#                        else 0
-##                    )
-#                    salle = next((s for s in salles if s.id == room_id), None)
-#
-#
-#
-#                    # Si le joueur entre dans une salle, vérifier les conditions
-#                    if salle:
-#                        if salle.verifier_conditions(selected_unit):
-#                            selected_unit.x, selected_unit.y = new_x, new_y
-#                            print(f"Vous êtes entré dans la salle {salle.id}.")
-#                        else:
-#                            print(f"Accès refusé à la salle {salle.id}.")
-#                    else:
-#                        # Pas de salle : déplacer normalement
-#                        selected_unit.x, selected_unit.y = new_x, new_y
-#                        
-#                    self.flip_display()
-#
-#                # Affichage des options principales (Avancer ou Attaquer)
-#
-#                if not selecting_attack:
-#                    options = ["Avancer", "Attaquer"]
-#                    for i, option in enumerate(options):
-#                        color = BLUE if i == current_option else WHITE
-#                        texte = font.render(option, True, color)
-#                        text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
-#                        self.screen.blit(texte, text_rect)
-#                
-#                # Affichage des attaques si l'option "Attaquer" est choisie
-#                else:
-#                    for i, attack in enumerate(selected_unit.liste_attaque):
-#                        color = BLUE if i == selected_attack else WHITE
-#                        texte = font.render(attack, True, color)
-#                        text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
-#                        self.screen.blit(texte, text_rect)
-#
-#                # Mise à jour de l'affichage#
-#
-#                pygame.display.flip()
+                    pygame.display.flip()
 
-         
 
     def gestion_attaque(self, selected_unit,selected_attack):
         if selected_attack == 0: 
@@ -540,7 +377,7 @@ class Game:
                         continue
 
                     # Vérifier si la case est occupée par une autre unité
-                    if self.is_occupied_by_unit(new_x, new_y):
+                    if self.is_occupied_by_unit(new_x, new_y) and self.unit_at_position(new_x,new_y) != selected_unit:
                         print("La case est déjà occupée ! Mouvement annulé.")
                         continue
 
@@ -585,7 +422,8 @@ class Game:
                             dx, dy = 0, 0
                             break
                     
-                    if event.key == pygame.K_RSHIFT:  # Touche entrer du pavé numérique
+                    if event.key == pygame.K_LSHIFT:  # Touche entrer du pavé numérique
+                        print("shift appuyé")
                         # Vérifier si un cristal peut être déposé sur une case requise
                         cristal_depose = False  # Flag pour éviter le ramassage juste après le dépôt
                         
@@ -604,7 +442,7 @@ class Game:
                                             
                                             # Ajouter l'objet à la carte
                                             new_crystal = GameObject(x, y, "Cristal", image_cristal)  # Cristal de couleur verte
-                                            self.objet.append(new_crystal)  # Ajouter le cristal à la carte
+                                            self.objects.append(new_crystal)  # Ajouter le cristal à la carte
                                             selected_unit.has_object.append(new_crystal)                                        
                                             # Afficher le message
                                             print(f"Le cristal a été déposé à la position ({x}, {y}) pour les conditions de la salle 5.")
@@ -614,11 +452,12 @@ class Game:
                                     break  # Si un cristal est déposé, pas besoin de continuer
                         # Si aucun cristal n'a été déposé, essayer de ramasser un objet
                         if not cristal_depose:  # Ramassage uniquement si aucun dépôt n'a été effectué
+                            print("tu n'a pas de cristal")
                             for obj in self.objects:
                                 if obj.x == selected_unit.x and obj.y == selected_unit.y:
                                     print(f"Vous avez ramassé {obj.name} !")
                                     obj.collected = True  # L'objet est ramassé
-                                    self.objet.remove(obj)    # Retirer de la carte
+                                    self.objects.remove(obj)    # Retirer de la carte
                                     
                                     # Ajoutez l'objet à la liste `has_object` (si elle existe, sinon initialisez-la)
                                     if not hasattr(selected_unit, 'has_object'):
@@ -627,20 +466,7 @@ class Game:
                                     selected_unit.has_object.append(obj)  # Ajouter l'objet à la liste
                                     print(f"L'objet dans has_object : {selected_unit.has_object[-1].name}")  # Affiche le dernier objet collecté
                                     break
-
-                    # Vérification pour ramasser des objets
-#                    for obj in self.objects:
-#                        if obj.x == new_x and obj.y == new_y:
-#                            print(f"Vous avez ramassé {obj.name} !")
-#                            obj.collected = True
-#                            self.objects.remove(obj)
-#                            if not hasattr(selected_unit, 'has_object'):
-#                                selected_unit.has_object = []
-#                            selected_unit.has_object.append(obj)
-#                            print(f"Inventaire : {selected_unit.has_object[-1].name}.")
-#                            break
-                       
-            
+                            
 
     def is_wall(self, x, y):
         """Vérifie si une case donnée contient un mur."""
@@ -699,6 +525,8 @@ class Game:
                 if enemy.is_selected:
                     enemy.is_selected = False
                     continue
+                elif self.player_units == []:
+                    continue
                 else:
                     print(f"tour de enemie {enemy.type}")
                     target = self.select_target_unit(enemy) #Position x,y de l'unité a viser
@@ -707,7 +535,7 @@ class Game:
 
                 attaque_choix = random.randint(0, 2)
                 enemy.attaque(enemy.liste_attaque[attaque_choix], self)
-
+ 
             
 
 
@@ -766,12 +594,19 @@ class Game:
         pygame.display.flip()
 
     def game_over(self) :
-        som = 0
-        for unit in self.player_units : 
-            if unit.en_vie == False : 
-                som+=1
-        if som == 3 :
-            self.In_Game = False
+        if self.player_units == [] :
+                self.screen.fill(RED)
+                color =  WHITE
+                texte = font.render("VOUS ETES MORT", True, color)
+                text_rect = texte.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+                self.screen.blit(texte, text_rect)
+                pygame.display.flip()
+                while True:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+
         
     def victoire(self) : 
         som = 0
@@ -834,13 +669,18 @@ class Game:
     
     def peu_jouer_roi(self, salles):
         player_rooms = self.get_player_rooms(salles)
-        for salle in player_rooms : 
+        for salle in player_rooms: 
             if salle.id == 5 : # un joueur est dans l'arene 
                 return True 
-        return False 
+        return False  
+     
+      
 
-    def create_monsters_in_room(self, salle):
-        """
+
+    def create_monsters_in_room(self, salle): 
+
+        """ 
+         
         Crée des monstres de manière aléatoire dans la salle donnée, sauf si c'est l'arène.
         
         Paramètre :
@@ -896,11 +736,12 @@ class Game:
     def En_jeu(self) : 
         self.debut_jeu()
         self.In_Game = True
-        while self.In_Game:
+        while True:
             self.handle_player_turn()
             self.handle_enemy_turn()
             self.spawn_monsters(salles)
             self.game_over()
+
             
    
 def main():

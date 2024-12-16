@@ -61,8 +61,6 @@ class Unit:
         self.niveau = niveau  # Niveau du joueur
         self.max_health = 100
         self.en_vie = True 
-        self.wall_damage = False
-        self.attaque = None
 
         
         
@@ -71,14 +69,6 @@ class Unit:
         if 0 <= self.x + dx < GRID_SIZE_H and 0 <= self.y + dy < GRID_SIZE_V:
             self.x += dx
             self.y += dy
-
-    def attack(self, target):
-        """Attaque une unité cible."""
-        self.wall_damage = False
-        if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
-            target.health -= self.puissance_attaque
-        if target.puissance_attaque >= ATTAQUE_DESTRUCTRICE :
-            self.wall_damage = True
 
 
     def update_attack(self, impact):
