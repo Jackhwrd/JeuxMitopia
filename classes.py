@@ -16,6 +16,7 @@ class Mage_player(Unit):
     def Longue_attaque(self, game, attaque):
         """Attaque à distance sur les ennemis qui sont dans une zone d'attaque de 4 à 6 carreaux avec un peu moins de puissance"""
         print(f'attaque longue')
+        print('dans longue attaque')
         x, y = attaque.x, attaque.y
         if game.is_occupied_by_enemy(x, y):
             enemy = game.unit_at_position(x, y)
@@ -26,18 +27,6 @@ class Mage_player(Unit):
             if not enemy.en_vie:
                 game.enemy_units.remove(enemy)
                 print(f"Enemie {enemy.type} est mort!")
-            # Sinon, vérifiez si la case ciblée est un mur
-        elif game.is_near_wall_at(x, y):
-            if self.puissance_attaque >= ATTAQUE_DESTRUCTRICE:  # Vérification de la puissance
-                # Trouver et détruire le mur
-                for wall in game.walls:
-                    if wall.contains(x, y):  # Vérifie si ce mur inclut la case ciblée
-                        game.walls.remove(wall)
-                        print(f"Le mur à ({x}, {y}) a été détruit !")
-                        break
-            else:
-                print("L'attaque n'est pas assez puissante pour détruire le mur !")
-                return attaque
         else:
             print("Il faut sélectionner un ennemi ou un mur !")
             return attaque
@@ -102,15 +91,7 @@ class Mage_player(Unit):
             degat_final = degat
         
         return degat_final-(degat_final*self.stat_defense)
-    
-#    def attaque(self,attaque_choisie,game):
-#        
-#        if attaque_choisie == "Longue attaque":
-#            self.Longue_attaque(game)
-#        elif attaque_choisie == "Régène" : 
-#            self.Regene(game)
-#        elif attaque_choisie == "Bouclier" : 
-#            self.Bouclier(game)
+
 
     def vise_attaque(self,attaque_choisie,game):
         
@@ -123,10 +104,9 @@ class Mage_player(Unit):
             self.Bouclier(game)
 
     def execute_attaque(self,game,attaque=None):
-        
-        if attaque == "Longue attaque":
-            print(f'éxécution de {attaque}')
-            return self.Longue_attaque(game,attaque)
+        print("dans exectution")
+#       print(f'éxécution de {attaque}')
+        return self.Longue_attaque(game,attaque)
 
 class Vampire_player(Unit):
 
@@ -196,15 +176,6 @@ class Vampire_player(Unit):
                      enemy.stat_defense -= 0.1  
                 
                 self.stat_attaque += 0.1
-
-# def attaque(self, attaque_choisie, game):
-#     if attaque_choisie == "Vampiriser":
-#         self.Vampiriser(game)
-#     elif attaque_choisie == "Furtif":
-#         self.Furtif(game)
-#     elif attaque_choisie == "Brouiller":
-#         self.Brouiller(game)
-
 
     def vise_attaque(self,attaque_choisie,game):
         if attaque_choisie == "Vampiriser":
@@ -284,6 +255,8 @@ class Guerrier_player(Unit):
                     degat_final = unit.degat_subit(self, degat)
                     unit.update_health(degat_final)
                 print(f"l'alliée {unit.type} est propulsé vers case sélectionné") if unit.team == "player" else print(f"l'enemie {unit.type} percute le mur et reçoit {degat_final}!") if is_near_wall(attaque.x, attaque.y,game.walls) else print(f"l'enemie s'envole et reçoit {degat_final}")
+                if unit.team == "player":
+                    unit.is_selected = False
                 if not unit.en_vie:
                         game.enemy_units.remove(unit)
                         print(f"l'enemie {unit.type} est mort!")
@@ -302,19 +275,6 @@ class Guerrier_player(Unit):
             print("Il vaut attraper un unit")
             return attaque
 
-
-
-    
-
-                    
-# def attaque(self, attaque_choisie, game):
-
-#     if attaque_choisie == "Frappe":
-#         self.Frappe(game)
-#     elif attaque_choisie == "Intimidation":
-#         self.Intimidation(game)
-#     elif attaque_choisie == "Attaque de groupe":
-#         self.Attaque_de_groupe(game)
 
     def vise_attaque(self,attaque_choisie,game):
         

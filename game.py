@@ -248,10 +248,6 @@ class Game:
         if selected_attack == 0: 
             print(f'{selected_unit.liste_attaque[0]}') 
             Attack = selected_unit.vise_attaque(selected_unit.liste_attaque[0],self)
-            print(f"Résultat de vise_attaque : {Attack}")
-            if Attack :
-                print(f'Cible trouvée, exécution de l attaque')
-                selected_unit.execute_attaque(self, Attack)
         elif selected_attack == 1:  
             Attack = selected_unit.vise_attaque(selected_unit.liste_attaque[1],self)
             print(f'{selected_unit.liste_attaque[1]}')
@@ -281,6 +277,7 @@ class Game:
                         return False
 
                     if event.key == pygame.K_RETURN:
+                        print("attack activé")
                         Attack = selected_unit.execute_attaque(self, Attack)
                         if Attack == None:
                             running = False
